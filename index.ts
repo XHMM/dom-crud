@@ -95,8 +95,13 @@ function ddom($dom) {
   $dom.remove();
 }
 
-
-function _splitBySign(str:string) {
+/*
+* split string and get its sign
+*
+* 'class-=a b c' ===>  ['class','a b c', '-=']
+*
+* */
+function _splitBySign(str:string):[string,string, '='|'+='|'-='] {
   let res = [];
   if(str.includes('-=')) {
     const idx = str.indexOf('-=');
@@ -113,23 +118,28 @@ function _splitBySign(str:string) {
   if(res.length!==3) throw new Error('options item not match key=val or key-=val or key+=val')
   return res;
 }
+// return type string: array string function null...
 function _type(val:any):string {
   const rightPart = Object.prototype.toString.call(val).split(' ')[1]
   return rightPart.slice(0, rightPart.length-1).toLowerCase()
 }
+// ' a b c'  ===> ['a', 'b', 'c']
 function _splitToDomClasses(str:string):string[] {
   return str.trim().split(' ');
 }
 /*
-* ['class-=a b c', 'id=a']
+*
+* ['class-=a b c', 'id=a', ...]
 * or
 * {
 *   'class-':'a b c',
-*   'id': 'a'
+*   'id': 'a',
+*   ...
 * }
-* =====>
-* [['class','a b c', '-='], ['id', 'a', '=']]
 *
+* =====>
+*
+* [['class','a b c', '-='], ['id', 'a', '='], ...]
 * */
 function _toKeyValSignEntries(options:any[]):Array<[string,string, '='|'+='|'-=']> {
   let res = [];
