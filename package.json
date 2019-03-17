@@ -1,0 +1,18 @@
+{
+  "name": "dom-crud",
+  "version": "1.0.0",
+  "description": "let't crud dom but not database",
+  "main": "./dist/index.js",
+  "typings": "./typing.d.ts",
+  "repository": "https://github.com/XHMM/dom-crud",
+  "author": "xhmm",
+  "license": "MIT",
+  "scripts": {
+    "watch": "parcel watch index.ts --no-source-maps",
+    "build": "parcel build index.ts --no-source-maps --out-file index.min.js"
+  },
+  "devDependencies": {
+    "parcel-bundler": "^1.12.2",
+    "typescript": "^3.3.3333"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "lib": ["dom","es5", "es6", "es2017.object"],
+    "module": "umd"
+  }
+}
