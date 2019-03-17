@@ -1,12 +1,12 @@
 <h1 align='center'>dom-crud</h1>
 
 
-### Description
+## Description
 Make dom manipulation easier, **c**(create) **r**(read) **u**(update) **d**(delete).
-### Install
+## Install
 - if using `script` tag:
 ```
-<script src="path/to/index.min.js"></script>
+<script src="https://unpkg.com/dom-crud@latest/dist/index.min.js"></script>
 <script>
     cdom(..)
     rdoms(..)
@@ -16,15 +16,15 @@ Make dom manipulation easier, **c**(create) **r**(read) **u**(update) **d**(dele
 ```
 - if using npm module: `npm i dom-crud` or `yarn add dom-crud`
 ```
-import "@xhmm/dom-crud"
+import "dom-crud"
 cdom(..)
 rdoms(..)
 udom(..)
 ddom(..)
 ```
 
-### Usage
-#### c(create)
+## Usage
+### c(create)
 You can pass any valid attributes when creating a dom, two ways are allowed:
 ```js
 // pass many strings
@@ -45,13 +45,13 @@ const $input2 = cdom('input', {
 // <input type='text' class='center big red' style='font-size:3rem;font-weight:bold'/>
 ```
 
-#### r(read)
+### r(read)
 Dom(s) reading is just a wrapper of `querySelector(All)`
 ```js
 const $input = rdom('.center');
 const $inputs = rdoms('input');
 ```
-#### u(update)
+### u(update)
 Updating dom is very funny, there are three signs `=` `-=` `+=`, each of them has different mean:
 - `=` mean overwrite
 - `-=` mean delete
@@ -65,11 +65,11 @@ udom($input, 'style-=color;font-size')
 udom($input, 'style+=color:blue;')
 
 ```
-#### d(delete)
+### d(delete)
 Deleting a dom js just remove it from document
 ```js
 ddom($input); 
 ```
 
-### License
+## License
 MIT

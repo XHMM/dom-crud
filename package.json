@@ -1,6 +1,6 @@
 {
   "name": "dom-crud",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "let't crud dom but not database",
   "main": "./dist/index.js",
   "typings": "./typing.d.ts",
@@ -14,5 +14,6 @@
   "devDependencies": {
     "parcel-bundler": "^1.12.2",
     "typescript": "^3.3.3333"
-  }
+  },
+  "keywords": ["dom", "crud"]
 }
