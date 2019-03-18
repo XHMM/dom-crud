@@ -1,32 +1,34 @@
-<h1 align='center'>dom-crud</h1>
+<h1>dom-crud</h1>
 
-
-## Description
 Make dom manipulation easier, **c**(create) **r**(read) **u**(update) **d**(delete).
+
 ## Install
 - if using `script` tag:
 ```
-<script src="https://unpkg.com/dom-crud@latest/dist/index.min.js"></script>
+<script src="https://unpkg.com/dom-crud@latest/build/index.umd.min.js"></script>
 <script>
-    cdom(..)
-    rdoms(..)
-    udom(..)
-    ddom(..)
+    crud.cdom(..)
+    crud.rdom(..)
+    crud.rdoms(..)
+    crud.udom(..)
+    crud.ddom(..)
 </script>
 ```
 - if using npm module: `npm i dom-crud` or `yarn add dom-crud`
 ```
-import "dom-crud"
-cdom(..)
-rdoms(..)
-udom(..)
-ddom(..)
+import {cdom, rdom, rdoms, udom, ddom} from "dom-crud"
+// usage below
 ```
 
 ## Usage
+**Warning:**  pay attention to your use env, if using with script tag, don't forget add `crud.` when invoking methods. 
 ### c(create)
+`cdom(tagName, str1, str2, obj1, str2, obj2...);`
+
 You can pass any valid attributes when creating a dom:
 ```js
+import {cdom} from 'dom-crud'
+
 // pass many strings
 const $input = cdom('input', 
 'class=center big red', 
@@ -57,32 +59,57 @@ const $input3 = cdom('input',
 ```
 
 ### r(read)
+`rdom(selector)`  
+`rdoms(selector)` 
+
 Dom(s) reading is just a wrapper of `querySelector(All)`
 ```js
+import {rdom} from 'dom-crud'
+
 const $input = rdom('.center').rdom('.word').rdom('.c'); // single dom can chain
 const $inputs = rdoms('input'); // multi doms cannot chain
 ```
 ### u(update)
+`udom(dom, str1, str2, obj1, str2, obj2...);`
+
 Updating dom is very funny, there are three signs `=` `-=` `+=`, each of them has different mean:
 - `=` mean overwrite
 - `-=` mean delete
 - `+=` mean append
 ```js
-// below will remove all inline styles and then add blue clor
-udom($input, 'style=color:blue;');
+import {udom, rdom} from 'dom-crud'
+
+// below will remove all inline styles and then add blue color
+udom(rdom('input'), 'style=color:blue;');
+// object style
+udom(rdom('input'), {
+    style:'color:blue'
+});
+
 
 // below will only remove color and font-size from inline styles if exists
-udom($input, 'style-=color;font-size')
+udom(rdom('input'), 'style-=color;font-size')
+// object style
+udom(rdom('input'), {
+    'style-':'color;font-size'
+})
 
 // below will append color to inline styles
-udom($input, 'style+=color:blue;')
+udom(rdom('input'), 'style+=color:blue;')
+// object style
+udom(rdom('input'), {
+    'style+':'color:blue'
+})
+
+// you can also mix string and object just like cdom(..)
 ```
-`udom($dom, ...options)` `options` have the same syntax as `cdom` mentioned above 
 
 ### d(delete)
 Deleting a dom js just remove it from document
 ```js
-ddom($input); 
+import {ddom, rdom} from 'dom-crud'
+
+ddom(rdom('input')); 
 ```
 
 ## License
