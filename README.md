@@ -25,7 +25,7 @@ ddom(..)
 
 ## Usage
 ### c(create)
-You can pass any valid attributes when creating a dom, two ways are allowed:
+You can pass any valid attributes when creating a dom:
 ```js
 // pass many strings
 const $input = cdom('input', 
@@ -34,9 +34,20 @@ const $input = cdom('input',
 'type=text'
 );
 
-// or pass an object
-const $input2 = cdom('input', {
+// or pass many object
+const $input2 = cdom('input', 
+{
   class:'center big red',
+  style:"font-size:3rem;font-weight:bold",
+}, 
+{
+  type:'text'
+});
+
+// or mixed
+const $input3 = cdom('input', 
+'class=center big red',
+{
   style:"font-size:3rem;font-weight:bold",
   type:'text'
 });
@@ -48,8 +59,8 @@ const $input2 = cdom('input', {
 ### r(read)
 Dom(s) reading is just a wrapper of `querySelector(All)`
 ```js
-const $input = rdom('.center');
-const $inputs = rdoms('input');
+const $input = rdom('.center').rdom('.word').rdom('.c'); // single dom can chain
+const $inputs = rdoms('input'); // multi doms cannot chain
 ```
 ### u(update)
 Updating dom is very funny, there are three signs `=` `-=` `+=`, each of them has different mean:
@@ -59,12 +70,15 @@ Updating dom is very funny, there are three signs `=` `-=` `+=`, each of them ha
 ```js
 // below will remove all inline styles and then add blue clor
 udom($input, 'style=color:blue;');
+
 // below will only remove color and font-size from inline styles if exists
 udom($input, 'style-=color;font-size')
+
 // below will append color to inline styles
 udom($input, 'style+=color:blue;')
-
 ```
+`udom($dom, ...options)` `options` have the same syntax as `cdom` mentioned above 
+
 ### d(delete)
 Deleting a dom js just remove it from document
 ```js
