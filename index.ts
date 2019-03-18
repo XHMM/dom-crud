@@ -1,4 +1,6 @@
-// 创建dom，不受sign影响，即class-=a 等同于class=a
+import {_toKeyValSignEntries, _splitToDomClasses} from "./utils";
+
+// creating dom not affected by signs:  class-=a is equal to class=a
 function cdom(tagName:string, ...options) {
   const $dom = document.createElement(tagName);
   let keyValSignEntries = _toKeyValSignEntries(options);
@@ -18,12 +20,19 @@ function cdom(tagName:string, ...options) {
   })
   return $dom;
 }
+
+// you can chain rdom
 function rdom(selector:string) {
-  return document.querySelector(selector);
+  const $dom = document.querySelector(selector);
+  // @ts-ignore
+  $dom.rdom = this.querySelector;
+  return $dom
 }
+// rdoms cannot chain
 function rdoms(selector:string) {
   return document.querySelectorAll(selector);
 }
+
 function udom($dom, ...options) {
   let keyValSignEntries = _toKeyValSignEntries(options);
   keyValSignEntries.map(option => {
@@ -39,9 +48,9 @@ function udom($dom, ...options) {
         $dom.classList.add(..._splitToDomClasses(val));
       }
     }
-    // 更新style时，需要注意：
     else if(key === 'style') {
-      // 如果是移除，则参数传入就是 'style-=color;font-size;' or {'style-': 'color;font-size'} ，即只包含属性名,
+      // if remove class, options should not include right value, for example: 'style-=color;font-size;' or {'style-': 'color;font-size'}
+      // if right value exists, it doesn't affect remove op
       if(sign=='-=') {
         const styleProperties = val.split(';');
         styleProperties.map(item => {
@@ -55,7 +64,7 @@ function udom($dom, ...options) {
       }
     }
     else if(key === 'text') {
-      // 如果是移除，则参数传入就是 'text-=' or {'text-': ''}
+      // if remove text, it's like style above, for example: 'text-=' or {'text-': ''}
       if(sign=='-=') {
         $dom.textContent = '';
       }
@@ -67,6 +76,7 @@ function udom($dom, ...options) {
       }
     }
     else if(key === 'html') {
+      // same as style and text when removing html
       if(sign=='-=') {
         $dom.innerHTML = '';
       }
@@ -91,72 +101,7 @@ function udom($dom, ...options) {
   })
   return $dom;
 }
+
 function ddom($dom) {
   $dom.remove();
-}
-
-/*
-* split string and get its sign
-*
-* 'class-=a b c' ===>  ['class','a b c', '-=']
-*
-* */
-function _splitBySign(str:string):[string,string, '='|'+='|'-='] {
-  let res = [];
-  if(str.includes('-=')) {
-    const idx = str.indexOf('-=');
-    res = [str.slice(0, idx), str.slice(idx+2), '-=']
-  }
-  if(str.includes('+=')) {
-    const idx = str.indexOf('+=');
-    res = [str.slice(0, idx), str.slice(idx+2), '+=']
-  }
-  if(str.includes('=')) {
-    const idx = str.indexOf('=');
-    res = [str.slice(0, idx), str.slice(idx+1), '=']
-  }
-  if(res.length!==3) throw new Error('options item not match key=val or key-=val or key+=val')
-  return res;
-}
-// return type string: array string function null...
-function _type(val:any):string {
-  const rightPart = Object.prototype.toString.call(val).split(' ')[1]
-  return rightPart.slice(0, rightPart.length-1).toLowerCase()
-}
-// ' a b c'  ===> ['a', 'b', 'c']
-function _splitToDomClasses(str:string):string[] {
-  return str.trim().split(' ');
-}
-/*
-*
-* ['class-=a b c', 'id=a', ...]
-* or
-* {
-*   'class-':'a b c',
-*   'id': 'a',
-*   ...
-* }
-*
-* =====>
-*
-* [['class','a b c', '-='], ['id', 'a', '='], ...]
-* */
-function _toKeyValSignEntries(options:any[]):Array<[string,string, '='|'+='|'-=']> {
-  let res = [];
-  if(_type(options[0]) =='object') {
-    Object.entries(options[0]).map( item => {
-      if(item[0].endsWith('-')) res.push([item[0].slice(0, item[0].length-2), item[1], '-=']);
-      else if(item[0].endsWith('+')) res.push([item[0].slice(0, item[0].length-2), item[1], '+=']);
-      else res.push([item[0], item[1], '=']);
-    })
-  }
-  if(_type(options[0]) =='string') {
-    if(!options.every(option => _type(option) ==='string')) throw new Error('If first option is string, all left must be string.')
-    else {
-      options.map(option => {
-        res.push(_splitBySign(option))
-      })
-    }
-  }
-  return res;
 }
