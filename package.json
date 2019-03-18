@@ -1,20 +1,23 @@
 {
   "name": "dom-crud",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "let't crud dom but not database",
-  "main": "./dist/index.js",
+  "main": "./build/index.esm.js",
   "typings": "./typing.d.ts",
   "repository": "https://github.com/XHMM/dom-crud",
   "author": "xhmm",
   "license": "MIT",
   "scripts": {
-    "watch": "parcel watch index.ts --no-source-maps",
-    "build": "parcel build index.ts --no-source-maps --out-file index.min.js"
+    "watch": "rollup -c --watch",
+    "build": "rollup -c"
   },
   "devDependencies": {
     "@types/jest": "^24.0.11",
     "jest": "^24.5.0",
-    "parcel-bundler": "^1.12.2",
+    "rollup": "^1.6.0",
+    "rollup-plugin-delete": "^0.2.1",
+    "rollup-plugin-terser": "^4.0.4",
+    "rollup-plugin-typescript2": "^0.20.1",
     "ts-jest": "^24.0.0",
     "typescript": "^3.3.3333"
   },
