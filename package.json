@@ -1,8 +1,9 @@
 {
   "name": "dom-crud",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "let't crud dom but not database",
   "main": "./build/index.esm.js",
+  "browser": "./build/index.esm.js",
   "typings": "./typing.d.ts",
   "repository": "https://github.com/XHMM/dom-crud",
   "author": "xhmm",

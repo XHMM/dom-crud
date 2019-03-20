@@ -4,7 +4,7 @@ Make dom manipulation easier, **c**(create) **r**(read) **u**(update) **d**(dele
 
 ## Install
 - if using `script` tag:
-```
+```html
 <script src="https://unpkg.com/dom-crud@latest/build/index.umd.min.js"></script>
 <script>
     crud.cdom(..)
@@ -111,6 +111,26 @@ import {ddom, rdom} from 'dom-crud'
 
 ddom(rdom('input')); 
 ```
+
+### ps: cdom and udom
+1. When using `udom` with `=`, the behavior is similar to `cdom` because `=` is a overwrite sign.  
+
+2. Below list some additional keys can make crud more funny:
+- `text`(string): this modify text conent in target dom
+- `html`(string): this modify html content in target dom
+- `doms`(array|array-like): this modify doms in target dom
+    ```js
+    const parent = rdom('#container')
+    const child = rdom('#child');
+    udom(parent, {
+        // append a new div to parent
+        'doms+': [ cdom('div', 'text=iam new')],
+         // child removed from parent
+        'doms-': [child],
+        // clear parent inner html and add a new div
+        'doms': [ cdom('div', 'text=only left me')]
+    })
+    ```
 
 ## License
 MIT

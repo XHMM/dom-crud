@@ -1,17 +1,32 @@
-import { _toKeyValSignEntries, _splitToDomClasses } from "./utils";
+import { stringToDomClasses } from "./helpers";
+import {toKVSEntries, appendDoms, removeDoms} from "./utils";
 
 // creating dom not affected by signs:  class-=a is equal to class=a
+// when dom and html exist at the same time, content will be added in order
 function cdom(tagName: string, ...options) {
   const $dom = document.createElement(tagName);
-  let keyValSignEntries = _toKeyValSignEntries(options);
+  let keyValSignEntries = toKVSEntries(options);
   keyValSignEntries.map(option => {
     const [key, val] = option;
-    if (key === "class") $dom.classList.add(..._splitToDomClasses(val));
-    else if (key === "style") $dom.style.cssText = val;
-    else if (key === "text") $dom.textContent = val;
-    else if (key === "html") $dom.innerHTML = val;
-    else {
-      $dom.setAttribute(key, val);
+    switch (key) {
+      case "class":
+        $dom.classList.add(...stringToDomClasses(val.toString()));
+        break;
+      case "style":
+        $dom.style.cssText = val.toString();
+        break;
+      case "text":
+        $dom.textContent = val.toString();
+        break;
+      case "html":
+        $dom.innerHTML += val.toString();
+        break;
+      case "doms":
+        appendDoms($dom, val);
+        break;
+      default:
+        $dom.setAttribute(key, val.toString());
+        break;
     }
   });
   return $dom;
@@ -29,64 +44,100 @@ function rdoms(selector: string) {
   return document.querySelectorAll(selector);
 }
 
+// when removing(-=), just write 'key-=' or {'key-':''}
 function udom($dom, ...options) {
-  let keyValSignEntries = _toKeyValSignEntries(options);
+  let keyValSignEntries = toKVSEntries(options);
   keyValSignEntries.map(option => {
     const [key, val, sign] = option;
-    if (key === "class") {
-      if (sign == "-=") {
-        $dom.classList.remove(..._splitToDomClasses(val));
-      }
-      if (sign == "+=") $dom.classList.add(..._splitToDomClasses(val));
-      if (sign == "=") {
-        $dom.className = "";
-        $dom.classList.add(..._splitToDomClasses(val));
-      }
-    } else if (key === "style") {
-      // if remove class, options should not include right value, for example: 'style-=color;font-size;' or {'style-': 'color;font-size'}
-      // if right value exists, it doesn't affect remove op
-      if (sign == "-=") {
-        const styleProperties = val.split(";");
-        styleProperties.map(item => {
-          $dom.style.removeProperty(item);
-        });
-      }
-      if (sign == "+=") $dom.style.cssText += val;
-      if (sign == "=") {
-        $dom.style.cssText = val;
-      }
-    } else if (key === "text") {
-      // if remove text, it's like style above, for example: 'text-=' or {'text-': ''}
-      if (sign == "-=") {
-        $dom.textContent = "";
-      }
-      if (sign == "+=") {
-        $dom.textContent += val;
-      }
-      if (sign == "=") {
-        $dom.textContent = val;
-      }
-    } else if (key === "html") {
-      // same as style and text when removing html
-      if (sign == "-=") {
-        $dom.innerHTML = "";
-      }
-      if (sign == "+=") {
-        $dom.innerHTML += val;
-      }
-      if (sign == "=") {
-        $dom.innerHTML = val;
-      }
-    } else {
-      if (sign == "-=") {
-        $dom.removeAttribute(key);
-      }
-      if (sign == "+=") {
-        $dom.setAttribute(key, val);
-      }
-      if (sign == "=") {
-        $dom.setAttribute(key, val);
-      }
+    switch (key) {
+      case "class":
+        _updateWithSigns(
+          sign,
+          () => {
+            $dom.className = "";
+            $dom.classList.add(...stringToDomClasses(val.toString()));
+          },
+          () => {
+            $dom.classList.add(...stringToDomClasses(val.toString()));
+          },
+          () => {
+            $dom.classList.remove(...stringToDomClasses(val.toString()));
+          }
+        );
+        break;
+      case "style":
+        _updateWithSigns(
+          sign,
+          () => {
+            $dom.style.cssText = val.toString();
+          },
+          () => {
+            $dom.style.cssText += val.toString();
+          },
+          () => {
+            const styleProperties = val.toString().split(";");
+            styleProperties.map(item => {
+              $dom.style.removeProperty(item);
+            });
+          }
+        );
+        break;
+      case "text":
+        _updateWithSigns(
+          sign,
+          () => {
+            $dom.textContent = val.toString();
+          },
+          () => {
+            $dom.textContent += val.toString();
+          },
+          () => {
+            $dom.textContent = "";
+          }
+        );
+        break;
+      case "html":
+        _updateWithSigns(
+          sign,
+          () => {
+            $dom.innerHTML = val.toString();
+          },
+          () => {
+            $dom.innerHTML += val.toString();
+          },
+          () => {
+            $dom.innerHTML = "";
+          }
+        );
+        break;
+      case "doms":
+        _updateWithSigns(
+          sign,
+          () => {
+            $dom.innerHTML = "";
+            appendDoms($dom, val);
+          },
+          () => {
+            appendDoms($dom, val);
+          },
+          () => {
+            removeDoms($dom, val)
+          }
+        );
+        break;
+      default:
+        _updateWithSigns(
+          sign,
+          () => {
+            $dom.setAttribute(key, val.toString());
+          },
+          () => {
+            $dom.setAttribute(key, val.toString());
+          },
+          () => {
+            $dom.removeAttribute(key);
+          }
+        );
     }
   });
   return $dom;
@@ -96,4 +147,14 @@ function ddom($dom) {
   $dom.remove();
 }
 
+function _updateWithSigns(
+  sign,
+  overwriteHandler,
+  appendHandler,
+  removeHandler
+) {
+  if (sign == "=") overwriteHandler();
+  if (sign == "+=") appendHandler();
+  if (sign == "-=") removeHandler();
+}
 export { cdom, rdom, udom, ddom };
