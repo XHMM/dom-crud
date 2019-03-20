@@ -15,7 +15,7 @@ Make dom manipulation easier, **c**(create) **r**(read) **u**(update) **d**(dele
 </script>
 ```
 - if using npm module: `npm i dom-crud` or `yarn add dom-crud`
-```
+```js
 import {cdom, rdom, rdoms, udom, ddom} from "dom-crud"
 // usage below
 ```
@@ -23,20 +23,23 @@ import {cdom, rdom, rdoms, udom, ddom} from "dom-crud"
 ## Usage
 **Warning:**  pay attention to your use env, if using with script tag, don't forget add `crud.` when invoking methods. 
 ### c(create)
-`cdom(tagName, str1, str2, obj1, str2, obj2...);`
+`cdom(tagName, strOrObj1, strOrObj2, strOrObj3, strOrOb4, ...);`
 
-You can pass any valid attributes when creating a dom:
+You can pass no limit valid key-values when creating a dom (some additional keys are list in the appendix(at the usage end)):
 ```js
 import {cdom} from 'dom-crud'
 
-// pass many strings
+// below will create a dom like this:
+// <input type='text' class='center big red' style='font-size:3rem;font-weight:bold'/>
+
+// you can pass only strings
 const $input = cdom('input', 
 'class=center big red', 
 'style=font-size:3rem;font-weight:bold', 
 'type=text'
 );
 
-// or pass many object
+// or pass only object
 const $input2 = cdom('input', 
 {
   class:'center big red',
@@ -53,9 +56,6 @@ const $input3 = cdom('input',
   style:"font-size:3rem;font-weight:bold",
   type:'text'
 });
-
-// above will create a dom like below:
-// <input type='text' class='center big red' style='font-size:3rem;font-weight:bold'/>
 ```
 
 ### r(read)
@@ -66,11 +66,13 @@ Dom(s) reading is just a wrapper of `querySelector(All)`
 ```js
 import {rdom} from 'dom-crud'
 
-const $input = rdom('.center').rdom('.word').rdom('.c'); // single dom can chain
-const $inputs = rdoms('input'); // multi doms cannot chain
+// when reading single dom, you can chain it
+const $input = rdom('.center').rdom('.word').rdom('.c'); 
+// multi doms cannot chain
+const $inputs = rdoms('input'); 
 ```
 ### u(update)
-`udom(dom, str1, str2, obj1, str2, obj2...);`
+`udom(dom, strOrObj1, strOrObj2, strOrObj3, strOrOb4, ...);`
 
 Updating dom is very funny, there are three signs `=` `-=` `+=`, each of them has different mean:
 - `=` mean overwrite
@@ -112,10 +114,8 @@ import {ddom, rdom} from 'dom-crud'
 ddom(rdom('input')); 
 ```
 
-### ps: cdom and udom
-1. When using `udom` with `=`, the behavior is similar to `cdom` because `=` is a overwrite sign.  
-
-2. Below list some additional keys can make crud more funny:
+### appendix
+Below list some additional keys can make crud more funny:
 - `text`(string): this modify text conent in target dom
 - `html`(string): this modify html content in target dom
 - `doms`(array|array-like): this modify doms in target dom
