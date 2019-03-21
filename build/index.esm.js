@@ -47,7 +47,7 @@ function __spread() {
     return ar;
 }
 
-// below all all **pure functions**
+// below are all pure functions
 // return type string: array string function null...
 function getType(val) {
     var rightPart = Object.prototype.toString.call(val).split(" ")[1];
@@ -212,6 +212,10 @@ function rdom(selector) {
     $dom.rdom = $dom.querySelector;
     return $dom;
 }
+// rdoms cannot chain
+function rdoms(selector) {
+    return document.querySelectorAll(selector);
+}
 // when removing(-=), just write 'key-=' or {'key-':''}
 function udom($dom) {
     var options = [];
@@ -299,4 +303,4 @@ function _updateWithSigns(sign, overwriteHandler, appendHandler, removeHandler) 
         removeHandler();
 }
 
-export { cdom, rdom, udom, ddom };
+export { cdom, ddom, rdom, rdoms, udom };

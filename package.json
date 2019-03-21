@@ -1,6 +1,6 @@
 {
   "name": "dom-crud",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "let't crud dom but not database",
   "main": "./build/index.esm.js",
   "browser": "./build/index.esm.js",
@@ -15,15 +15,15 @@
   "devDependencies": {
     "@types/jest": "^24.0.11",
     "jest": "^24.5.0",
-    "rollup": "^1.6.0",
+    "rollup": "^1.7.0",
     "rollup-plugin-delete": "^0.2.1",
     "rollup-plugin-terser": "^4.0.4",
     "rollup-plugin-typescript2": "^0.20.1",
     "ts-jest": "^24.0.0",
-    "typescript": "^3.3.3333"
+    "typescript": "^3.3.4000"
   },
   "keywords": [
     "dom",
-    "crud"
+    "dom-crud"
   ]
 }

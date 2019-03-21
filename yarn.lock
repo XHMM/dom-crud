@@ -2914,10 +2914,10 @@ rollup-pluginutils@2.4.1:
     estree-walker "^0.6.0"
     micromatch "^3.1.10"
 
-rollup@^1.6.0:
-  version "1.6.0"
-  resolved "http://registry.npm.taobao.org/rollup/download/rollup-1.6.0.tgz#4329f4634718197c678d18491724d50d8b7ee76c"
-  integrity sha1-Qyn0Y0cYGXxnjRhJFyTVDYt+52w=
+rollup@^1.7.0:
+  version "1.7.0"
+  resolved "http://registry.npm.taobao.org/rollup/download/rollup-1.7.0.tgz#2f5063c0f344f2225d1077655dc54d105a512bb2"
+  integrity sha1-L1BjwPNE8iJdEHdlXcVNEFpRK7I=
   dependencies:
     "@types/estree" "0.0.39"
     "@types/node" "^11.9.5"
@@ -3375,10 +3375,10 @@ type-check@~0.3.2:
   dependencies:
     prelude-ls "~1.1.2"
 
-typescript@^3.3.3333:
-  version "3.3.3333"
-  resolved "http://registry.npm.taobao.org/typescript/download/typescript-3.3.3333.tgz#171b2c5af66c59e9431199117a3bcadc66fdcfd6"
-  integrity sha1-FxssWvZsWelDEZkRejvK3Gb9z9Y=
+typescript@^3.3.4000:
+  version "3.3.4000"
+  resolved "http://registry.npm.taobao.org/typescript/download/typescript-3.3.4000.tgz#76b0f89cfdbf97827e1112d64f283f1151d6adf0"
+  integrity sha1-drD4nP2/l4J+ERLWTyg/EVHWrfA=
 
 uglify-js@^3.1.4:
   version "3.4.10"
