@@ -23,7 +23,7 @@ import {cdom, rdom, rdoms, udom, ddom} from "dom-crud"
 ## Usage
 **Warning:**  pay attention to your use env, if using with script tag, don't forget add `crud.` when invoking methods. 
 ### c(create)
-`cdom(tagName, strOrObj1, strOrObj2, strOrObj3, strOrOb4, ...);`
+`cdom(tagName, strOrObj1, strOrObj2, strOrObj3, strOrObj4, ...);`
 
 You can pass no limit valid key-values when creating a dom (some additional keys are list in the appendix(at the usage end)):
 ```js
@@ -72,7 +72,7 @@ const $input = rdom('.center').rdom('.word').rdom('.c');
 const $inputs = rdoms('input'); 
 ```
 ### u(update)
-`udom(dom, strOrObj1, strOrObj2, strOrObj3, strOrOb4, ...);`
+`udom(dom, strOrObj1, strOrObj2, strOrObj3, strOrObj4, ...);`
 
 Updating dom is very funny, there are three signs `=` `-=` `+=`, each of them has different mean:
 - `=` mean overwrite

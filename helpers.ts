@@ -1,4 +1,4 @@
-// below all all **pure functions**
+// below are all pure functions
 
 // return type string: array string function null...
 export function getType(val: any): string {
