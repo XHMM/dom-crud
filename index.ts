@@ -157,4 +157,4 @@ function _updateWithSigns(
   if (sign == "+=") appendHandler();
   if (sign == "-=") removeHandler();
 }
-export { cdom, rdom, udom, ddom };
+export { cdom, rdom, rdoms, udom, ddom };
