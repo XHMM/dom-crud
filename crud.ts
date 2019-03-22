@@ -4,7 +4,7 @@ import {
   KVSEntryFromObject,
   toKVSEntries,
   isValidDomsValue,
-  Sign
+  Sign, getType
 } from "./helpers";
 import { readConfigByKey } from "./config";
 
@@ -163,8 +163,15 @@ function udom(
   return $dom;
 }
 
-function ddom($dom: HTMLElement): void {
-  $dom.remove();
+function ddom($dom: HTMLElement|null): boolean {
+  if($dom instanceof Element) {
+    $dom.remove();
+    return true
+  }
+  else {
+    _console.warn(`[dom-crud:ddom] you passed an invalid parameter(type is ${getType($dom)}), ddom removed nothing`)
+    return false
+  }
 }
 
 function _appendDoms(

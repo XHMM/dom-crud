@@ -123,7 +123,7 @@ udom(rdom('input'), {
 ### delete
 #### `ddom(dom)`
 - dom: element
-- **return**: void
+- **return**: boolean -- whether removed dom
 ```js
 import {ddom, rdom} from 'dom-crud'
 
@@ -148,7 +148,9 @@ In order to be more flexible, we added a global config object to **control how `
           // whether append dom before script tags
           beforeScript: false
         }
-      }
+      },
+      // whether log debug info(currently, nothing cumbersome logged)
+      debug: false
     } 
     */
     ```

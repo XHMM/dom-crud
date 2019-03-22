@@ -118,11 +118,14 @@ describe('udom with global config', () => {
 })
 
 describe('ddom', () => {
-  test('', () => {
+  test('delete a existing dom and return true', () => {
     const $div = cdom('div', 'id=a');
     document.body.append($div);
     expect(document.body.contains($div)).toBeTruthy();
     ddom($div);
     expect(document.body.contains($div)).toBeFalsy();
+  })
+  test('if dom not exist, return false', () => {
+    expect(ddom(document.querySelector('div'))).toBeFalsy();
   })
 })
