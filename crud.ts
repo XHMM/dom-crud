@@ -1,12 +1,10 @@
 import {
   stringToDomClasses,
-  KVSEntryFromString,
-  KVSEntryFromObject,
   toKVSEntries,
   isValidDomsValue,
   Sign, getType
 } from "./helpers";
-import { readConfigByKey } from "./config";
+import {readConfigByKey, _console} from "./config";
 
 interface ISignHandler {
   (): void;
@@ -210,7 +208,7 @@ function _removeDoms($container: Element, doms: unknown) {
   for (const dom of doms) {
     if (dom.parentNode == $container) dom.remove();
     else {
-      console.warn(
+      _console.warn(
         `encountered a dom that is not a child dom, removing skipped`
       );
     }

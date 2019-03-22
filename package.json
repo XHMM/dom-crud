@@ -1,6 +1,6 @@
 {
   "name": "dom-crud",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "let't crud dom but not database",
   "main": "./build/index.esm.js",
   "typings": "./build/index.d.ts",
@@ -8,14 +8,17 @@
   "author": "xhmm",
   "license": "MIT",
   "scripts": {
-    "watch": "rollup -c --watch",
-    "build": "rollup -c"
+    "watch": "rollup -c --watch --environment BUILD:development",
+    "build": "rollup -c --environment BUILD:production"
   },
   "devDependencies": {
     "@types/jest": "^24.0.11",
     "jest": "^24.5.0",
     "rollup": "^1.7.0",
+    "rollup-plugin-commonjs": "^9.2.1",
     "rollup-plugin-delete": "^0.2.1",
+    "rollup-plugin-node-resolve": "^4.0.1",
+    "rollup-plugin-replace": "^2.1.1",
     "rollup-plugin-terser": "^4.0.4",
     "rollup-plugin-typescript2": "^0.20.1",
     "ts-jest": "^24.0.0",
@@ -24,5 +27,8 @@
   "keywords": [
     "dom",
     "dom-crud"
-  ]
+  ],
+  "dependencies": {
+    "lodash.clonedeep": "^4.5.0"
+  }
 }

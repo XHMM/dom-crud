@@ -1,14 +1,18 @@
 import typescript from "rollup-plugin-typescript2";
 import { terser } from "rollup-plugin-terser";
 import del from "rollup-plugin-delete";
+import commonjs from 'rollup-plugin-commonjs';
+import resolve from 'rollup-plugin-node-resolve';
+import replace from 'rollup-plugin-replace';
 
+const files = ["index.ts", "config.ts", "crud.ts", "helpers.ts"]
 const common = {
   input: "./index.ts",
   watch: {
-    include: ["index.ts", "config.ts", "crud.ts", "helpers.ts"]
+    include: files
   }
 };
-const plugins = [typescript(), ];
+const plugins = [typescript(), replace({BUILD: JSON.stringify(process.env.BUILD),include: files}), resolve(), commonjs()];
 
 const umdConfig = {
   ...common,

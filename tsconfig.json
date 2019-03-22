@@ -7,8 +7,7 @@
     "esModuleInterop": true,
     "strict": true,
     "declaration": true,
-    "outDir": "build",
-    "emitDeclarationOnly": true
+    "outDir": "build"
   },
   "include": ["index.ts", "config.ts", "crud.ts", "helpers.ts"],
   "exclude": ["node_modules"]
