@@ -5,7 +5,7 @@ import del from "rollup-plugin-delete";
 const common = {
   input: "./index.ts",
   watch: {
-    include: ["index.ts", "utils.ts"]
+    include: ["index.ts", "config.ts", "crud.ts", "helpers.ts"]
   }
 };
 const plugins = [typescript(), ];

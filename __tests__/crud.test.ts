@@ -1,4 +1,5 @@
-import {cdom,rdom,rdoms,udom,ddom} from '../index'
+import {cdom,rdom,rdoms,udom,ddom} from '../crud'
+import {getCrudConfig, updateCrudConfig} from "../config";
 
 describe('cdom', () => {
   test('create a dom without attributes', ()=>{
@@ -58,12 +59,61 @@ describe('udom', () => {
     expect($div.style.color).toBe('red')
     expect($div.style.fontSize).toBe('2rem')
   })
+  test('append', () => {
+    const $div = cdom('div', 'style=color:red');
+    udom($div, {
+      'style+':'font-size:2rem'
+    });
+    expect($div.style.color).toBe('red')
+    expect($div.style.fontSize).toBe('2rem')
+  })
   test('remove', () => {
     const $div = cdom('div', 'style=color:red');
     udom($div, {
       'style-':'color'
     });
     expect($div.style.color).toBe('')
+  })
+})
+describe('udom with global config', () => {
+  const configClone = Object.freeze(JSON.parse(JSON.stringify(getCrudConfig())));
+  const $div1 = cdom('div', 'id=a');
+  const $div2 = cdom('div', 'id=b');
+  function initHtmlWithOneScriptTag() {
+    document.body.innerHTML = '';
+    document.body.append(document.createElement('script'));
+  }
+
+  beforeEach( ()=> {
+    updateCrudConfig(configClone);
+    initHtmlWithOneScriptTag();
+  })
+
+  test('with default config, doms+= append doms orderly', () => {
+    udom(document.body, {
+      'doms+': [$div1, $div2]
+    });
+    const allDoms = document.body.querySelectorAll('*');
+    expect(allDoms[0].tagName).toBe('SCRIPT')
+    expect(allDoms[1].getAttribute('id')).toBe('a')
+    expect(allDoms[2].getAttribute('id')).toBe('b')
+  })
+
+  test('with changed config, doms+= append doms before script tag within body', () => {
+    updateCrudConfig({
+      'doms':{
+        "+=":{
+          beforeScript:true
+        }
+      }
+    })
+    udom(document.body, {
+      'doms+': [$div1, $div2]
+    });
+    const allDoms = document.body.querySelectorAll('*');
+    expect(allDoms[0].getAttribute('id')).toBe('a')
+    expect(allDoms[1].getAttribute('id')).toBe('b')
+    expect(allDoms[2].tagName).toBe('SCRIPT')
   })
 })
 

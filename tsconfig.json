@@ -4,6 +4,12 @@
     "lib": ["dom","es5", "es6", "es2017.object"],
     "module": "es2015",
     "downlevelIteration": true,
-    "esModuleInterop": true
-  }
+    "esModuleInterop": true,
+    "strict": true,
+    "declaration": true,
+    "outDir": "build",
+    "emitDeclarationOnly": true
+  },
+  "include": ["index.ts", "config.ts", "crud.ts", "helpers.ts"],
+  "exclude": ["node_modules"]
 }
