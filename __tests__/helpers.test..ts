@@ -10,7 +10,7 @@ describe('getType', ()=> {
     expect(getType([])).toBe('array')
     expect(getType({})).toBe('object')
     expect(getType(function(){})).toBe('function')
-    expect(getType(document.createElement('div'))).toBe('htmlelement')
+    expect(getType(document.createElement('div'))).toBe('htmldivelement')
   })
 })
 

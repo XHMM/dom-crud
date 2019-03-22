@@ -126,6 +126,6 @@ describe('ddom', () => {
     expect(document.body.contains($div)).toBeFalsy();
   })
   test('if dom not exist, return false', () => {
-    expect(ddom(document.querySelector('div'))).toBeFalsy();
+    expect(ddom(document.querySelector('#notExist'))).toBeFalsy();
   })
 })
