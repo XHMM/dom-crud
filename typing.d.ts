@@ -17,3 +17,7 @@ declare function udom<T extends HTMLElement>($dom:T,...options:DomStringOptions)
 declare function udom<T extends HTMLElement>($dom:T,option:DomObjectOption):T;
 
 declare function ddom($dom):void;
+
+export {
+  cdom, rdom, rdoms, udom, ddom
+}
