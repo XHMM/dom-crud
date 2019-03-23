@@ -10,6 +10,12 @@ interface ICrudConfig {
   };
   debug: boolean
 }
+interface IConsole {
+  log(methodName:string, msg:any):void
+  warn(methodName:string, msg:any):void
+  error(methodName:string, msg:any):void
+}
+
 
 // this object must have at most two level depth, must can to be a  valid JSON
 const _crudConfig: ICrudConfig = {
@@ -20,23 +26,33 @@ const _crudConfig: ICrudConfig = {
   },
   debug: false
 };
-const _nativeConsoleClone = cloneDeep(console);
-// for debug use todo: add more useful debug info to console
-let _console = console ;
+// todo: add more debug info for apis
+// @ts-ignore
+let _console: IConsole = {} ;
 function _muteConsole() {
   _console.log = function() {}
   _console.warn = function () {}
   _console.error = function () {}
 }
+function _activateConsole() {
+  _console.log = function(methodName:string, msg:any) {
+    console.log('%c[dom-crud:log][%s]\n %c%s',"color:#18b7ff;background:rgba(0,0,0,0.02);padding:0.2rem", methodName,"background:rgba(0,0,0,0.02);padding:0.2rem", msg)
+  }
+  _console.warn = function (methodName:string, msg:any) {
+    console.log('%c[dom-crud:warn][%s]\n %c%s',"color:orange;background:rgba(0,0,0,0.02);padding:0.2rem", methodName,"background:rgba(0,0,0,0.02);padding:0.2rem", msg)
+  }
+  _console.error = function (methodName:string, msg:any) {
+    console.log('%c[dom-crud:error][%s]\n %c%s',"color:red;background:rgba(0,0,0,0.02);padding:0.2rem", methodName,"background:rgba(0,0,0,0.02);padding:0.2rem", msg)
+  }
+}
 const _crudConfigProxy = new Proxy(_crudConfig, {
   set(target, key, val) {
     if(key == 'debug') {
-      console.log(key, val)
       if(val == false) {
         _muteConsole()
       }
       else {
-        _console = _nativeConsoleClone;
+        _activateConsole();
       }
     }
     // @ts-ignore

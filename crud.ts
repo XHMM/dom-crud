@@ -167,7 +167,7 @@ function ddom($dom: HTMLElement|null): boolean {
     return true
   }
   else {
-    _console.warn(`[dom-crud:ddom] you passed an invalid parameter(type is ${getType($dom)}), ddom removed nothing`)
+    _console.warn('ddom',`you passed an invalid parameter(type is ${getType($dom)}), ddom removed nothing`)
     return false
   }
 }
@@ -208,9 +208,7 @@ function _removeDoms($container: Element, doms: unknown) {
   for (const dom of doms) {
     if (dom.parentNode == $container) dom.remove();
     else {
-      _console.warn(
-        `encountered a dom that is not a child dom, removing skipped`
-      );
+      _console.warn('_removeDoms',`encountered a dom that is not a child dom, removing skipped`);
     }
   }
 }
