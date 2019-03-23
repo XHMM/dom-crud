@@ -1,5 +1,3 @@
-// @ts-ignore
-import cloneDeep from 'lodash.clonedeep';
 import {getType, merge} from "./helpers";
 
 interface ICrudConfig {
