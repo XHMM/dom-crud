@@ -89,24 +89,7 @@ describe('udom with global config', () => {
     initHtmlWithOneScriptTag();
   })
 
-  test('with default config, doms+= append doms orderly', () => {
-    udom(document.body, {
-      'doms+': [$div1, $div2]
-    });
-    const allDoms = document.body.querySelectorAll('*');
-    expect(allDoms[0].tagName).toBe('SCRIPT')
-    expect(allDoms[1].getAttribute('id')).toBe('a')
-    expect(allDoms[2].getAttribute('id')).toBe('b')
-  })
-
-  test('with changed config, doms+= append doms before script tag within body', () => {
-    updateCrudConfig({
-      'doms':{
-        "+=":{
-          beforeScript:true
-        }
-      }
-    })
+  test('with default config, doms+= append doms orderly but before scripts tag', () => {
     udom(document.body, {
       'doms+': [$div1, $div2]
     });
@@ -114,6 +97,23 @@ describe('udom with global config', () => {
     expect(allDoms[0].getAttribute('id')).toBe('a')
     expect(allDoms[1].getAttribute('id')).toBe('b')
     expect(allDoms[2].tagName).toBe('SCRIPT')
+  })
+
+  test('with changed config, doms+= append doms before script tag within body', () => {
+    updateCrudConfig({
+      'doms':{
+        "+=":{
+          beforeScript:false
+        }
+      }
+    })
+    udom(document.body, {
+      'doms+': [$div1, $div2]
+    });
+    const allDoms = document.body.querySelectorAll('*');
+    expect(allDoms[0].tagName).toBe('SCRIPT')
+    expect(allDoms[1].getAttribute('id')).toBe('a')
+    expect(allDoms[2].getAttribute('id')).toBe('b')
   })
 })
 

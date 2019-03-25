@@ -9,7 +9,7 @@ describe("getCrudConfig", function() {
       // copy
       doms: {
         "+=": {
-          beforeScript: false
+          beforeScript: true
         }
       },
       debug: false
@@ -21,7 +21,7 @@ describe("readConfigByKey", function() {
   test('get "doms" config from global config', () => {
     expect(readConfigByKey("doms")).toEqual({
       "+=": {
-        beforeScript: false
+        beforeScript: true
       }
     });
   });
@@ -39,7 +39,7 @@ describe("updateCrudConfig", function() {
     expect(getCrudConfig()).toEqual({
       doms: {
         "+=": {
-          beforeScript: false
+          beforeScript: true
         }
       },
       debug: false
@@ -50,7 +50,7 @@ describe("updateCrudConfig", function() {
     updateCrudConfig({
       doms: {
         "+=": {
-          beforeScript: true
+          beforeScript: false
         }
       }
     });
@@ -58,7 +58,7 @@ describe("updateCrudConfig", function() {
       // copy
       doms: {
         "+=": {
-          beforeScript: true
+          beforeScript: false
         }
       },
       debug: false

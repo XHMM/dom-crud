@@ -145,8 +145,8 @@ In order to be more flexible, we added a global config object to **control how `
     {
       doms: {
         "+=": {
-          // whether append dom before script tags
-          beforeScript: false
+          // whether append dom before script tags, default true
+          beforeScript: true
         }
       },
       // whether log debug info(currently, nothing cumbersome logged)
@@ -164,7 +164,7 @@ const config = getCrudConfig();
 updateCrudConfig({
     doms: {
         "+=": {
-            beforeScript: true
+            beforeScript: false
         },
         '=': 'xx' // this will be ignored
     }

@@ -19,7 +19,7 @@ interface IConsole {
 const _crudConfig: ICrudConfig = {
   doms: {
     "+=": {
-      beforeScript: false
+      beforeScript: true
     }
   },
   debug: false
