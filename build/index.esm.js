@@ -256,9 +256,12 @@ function cdom(tagName) {
 // you can chain rdom
 function rdom(selector) {
     var $dom = document.querySelector(selector);
-    // @ts-ignore
-    $dom.rdom = $dom.querySelector;
-    return $dom;
+    if ($dom) {
+        // @ts-ignore
+        $dom.rdom = $dom.querySelector;
+        return $dom;
+    }
+    return null;
 }
 // rdoms cannot chain
 function rdoms(selector) {
