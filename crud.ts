@@ -47,9 +47,12 @@ function cdom(
 // you can chain rdom
 function rdom<E extends Element = Element>(selector: string): E | null {
   const $dom = document.querySelector<E>(selector);
-  // @ts-ignore
-  $dom.rdom = $dom.querySelector;
-  return $dom;
+  if($dom) {
+    // @ts-ignore
+    $dom.rdom = $dom.querySelector;
+    return $dom;
+  }
+  return null;
 }
 // rdoms cannot chain
 function rdoms<E extends Element = Element>(selector: string): NodeListOf<E> {
