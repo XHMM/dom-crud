@@ -25,6 +25,7 @@ describe('cdom', () => {
   })
 })
 
+/* todo: 1.add test for chain 2. add test for null check*/
 describe('rdom', () => {
   test('read by id', () => {
     const $div = cdom('div', 'id=d');
