@@ -1,0 +1,12 @@
+{
+  "extends": ["xhmm/ts-browser"],
+  "parserOptions": {
+    "project": "./tsconfig.json",
+    "tsconfigRootDir": "./"
+  },
+  "settings": {
+    "polyfills": [
+      "Object.entries"
+    ]
+  }
+}

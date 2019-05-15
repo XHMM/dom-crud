@@ -1,12 +1,12 @@
-export type Sign = "=" | "+=" | "-=";
+type Sign = "=" | "+=" | "-=";
 
 // we call xx=aa xx-=aa xx+=aa xx-= xx+= xx= KVS string
 // we call [xx, yy, sign] KVS entry
-export type KVSEntryFromString = [string, string, Sign];
-export type KVSEntryFromObject = [string, any, Sign];
+type KVSEntryFromString = [string, string, Sign];
+type KVSEntryFromObject = [string, any, Sign];
 
 // define accepted valid type for V(value) in KVS
-export type ValidDomsValue = Element[] | NodeList | HTMLCollection;
+type ValidDomsValue = Element[] | NodeList | HTMLCollection;
 // export type ValidTypeValue = xx
 // export type ValidXxxValue = xx
 
@@ -29,9 +29,9 @@ function stringToDomClasses(str: string): string[] {
     .filter(item => item !== "");
 }
 
-function isValidDomsValue(val: any) {
+function isValidDomsValue(val: any): boolean {
   let type = getType(val);
-  if(type ==='array') return val.every((item:any) => (item instanceof Element))
+  if (type === "array") return val.every((item: any) => item instanceof Element);
   else return type === "nodelist" || type === "htmlcollection";
 }
 // function _isValidTypeValue() ...
@@ -68,9 +68,7 @@ function _objectToKVSEntry(obj: Record<string, any>): KVSEntryFromObject[] {
   return res;
 }
 // below function not deal with KVS's  V part, it should be dealt depend on key in cdom/udom
-function toKVSEntries(
-  options: any[]
-): Array<KVSEntryFromString | KVSEntryFromObject> {
+function toKVSEntries(options: any[]): Array<KVSEntryFromString | KVSEntryFromObject> {
   let res = [];
   for (const option of options) {
     if (getType(option) == "string") {
@@ -83,24 +81,36 @@ function toKVSEntries(
 }
 
 // only merge attributes target exist
-function merge(target:any, source:any) {
-  const targetType =getType(target);
+function merge(target: any, source: any): void {
+  const targetType = getType(target);
   const sourceType = getType(source);
-  if(targetType!=='object' || sourceType !=='object')
-    throw new TypeError(`target and source should both be object, received: target is ${targetType}, source is ${sourceType}`)
+  if (targetType !== "object" || sourceType !== "object")
+    throw new TypeError(
+      `target and source should both be object, received: target is ${targetType}, source is ${sourceType}`
+    );
   for (const sourceKey in source) {
-    if(source.hasOwnProperty(sourceKey)) {
-      if(sourceKey in target) {
-        const subTargetTypeIsObj =getType(target[sourceKey])=='object';
-        const subSourceTypeIsObj = getType(source[sourceKey]) == 'object';
-        if((!subSourceTypeIsObj) && (!subTargetTypeIsObj)) {
+    if (source.hasOwnProperty(sourceKey)) {
+      if (sourceKey in target) {
+        const subTargetTypeIsObj = getType(target[sourceKey]) == "object";
+        const subSourceTypeIsObj = getType(source[sourceKey]) == "object";
+        if (!subSourceTypeIsObj && !subTargetTypeIsObj) {
           target[sourceKey] = source[sourceKey];
-        } else if(subTargetTypeIsObj && subSourceTypeIsObj) {
-          merge(target[sourceKey], source[sourceKey])
+        } else if (subTargetTypeIsObj && subSourceTypeIsObj) {
+          merge(target[sourceKey], source[sourceKey]);
         }
       }
     }
   }
 }
 
-export { getType, stringToDomClasses, isValidDomsValue, toKVSEntries,merge };
+export {
+  getType,
+  stringToDomClasses,
+  isValidDomsValue,
+  toKVSEntries,
+  merge,
+  Sign,
+  KVSEntryFromString,
+  KVSEntryFromObject,
+  ValidDomsValue
+};

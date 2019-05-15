@@ -1,3 +1,12 @@
+/* eslint-disable compat/compat */
+if (!Object.entries)
+    Object.entries = function (obj) {
+        var ownProps = Object.keys(obj), i = ownProps.length, resArray = new Array(i); // preallocate the Array
+        while (i--)
+            resArray[i] = [ownProps[i], obj[ownProps[i]]];
+        return resArray;
+    };
+
 /*! *****************************************************************************
 Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use
@@ -67,8 +76,8 @@ function stringToDomClasses(str) {
 }
 function isValidDomsValue(val) {
     var type = getType(val);
-    if (type === 'array')
-        return val.every(function (item) { return (item instanceof Element); });
+    if (type === "array")
+        return val.every(function (item) { return item instanceof Element; });
     else
         return type === "nodelist" || type === "htmlcollection";
 }
@@ -137,14 +146,14 @@ function toKVSEntries(options) {
 function merge(target, source) {
     var targetType = getType(target);
     var sourceType = getType(source);
-    if (targetType !== 'object' || sourceType !== 'object')
+    if (targetType !== "object" || sourceType !== "object")
         throw new TypeError("target and source should both be object, received: target is " + targetType + ", source is " + sourceType);
     for (var sourceKey in source) {
         if (source.hasOwnProperty(sourceKey)) {
             if (sourceKey in target) {
-                var subTargetTypeIsObj = getType(target[sourceKey]) == 'object';
-                var subSourceTypeIsObj = getType(source[sourceKey]) == 'object';
-                if ((!subSourceTypeIsObj) && (!subTargetTypeIsObj)) {
+                var subTargetTypeIsObj = getType(target[sourceKey]) == "object";
+                var subSourceTypeIsObj = getType(source[sourceKey]) == "object";
+                if (!subSourceTypeIsObj && !subTargetTypeIsObj) {
                     target[sourceKey] = source[sourceKey];
                 }
                 else if (subTargetTypeIsObj && subSourceTypeIsObj) {
@@ -174,18 +183,18 @@ function _muteConsole() {
 }
 function _activateConsole() {
     _console.log = function (methodName, msg) {
-        console.log('%c[dom-crud:log][%s]\n %c%s', "color:#18b7ff;background:rgba(0,0,0,0.02);padding:0.2rem", methodName, "background:rgba(0,0,0,0.02);padding:0.2rem", msg);
+        console.log("%c[dom-crud:log][%s]\n %c%s", "color:#18b7ff;background:rgba(0,0,0,0.02);padding:0.2rem", methodName, "background:rgba(0,0,0,0.02);padding:0.2rem", msg);
     };
     _console.warn = function (methodName, msg) {
-        console.log('%c[dom-crud:warn][%s]\n %c%s', "color:orange;background:rgba(0,0,0,0.02);padding:0.2rem", methodName, "background:rgba(0,0,0,0.02);padding:0.2rem", msg);
+        console.log("%c[dom-crud:warn][%s]\n %c%s", "color:orange;background:rgba(0,0,0,0.02);padding:0.2rem", methodName, "background:rgba(0,0,0,0.02);padding:0.2rem", msg);
     };
     _console.error = function (methodName, msg) {
-        console.log('%c[dom-crud:error][%s]\n %c%s', "color:red;background:rgba(0,0,0,0.02);padding:0.2rem", methodName, "background:rgba(0,0,0,0.02);padding:0.2rem", msg);
+        console.log("%c[dom-crud:error][%s]\n %c%s", "color:red;background:rgba(0,0,0,0.02);padding:0.2rem", methodName, "background:rgba(0,0,0,0.02);padding:0.2rem", msg);
     };
 }
 var _crudConfigProxy = new Proxy(_crudConfig, {
     set: function (target, key, val) {
-        if (key == 'debug') {
+        if (key == "debug") {
             if (val == false) {
                 _muteConsole();
             }
@@ -205,7 +214,7 @@ function getCrudConfig() {
 }
 function updateCrudConfig(newConfig) {
     var type = getType(newConfig);
-    if (type !== 'object')
+    if (type !== "object")
         throw new TypeError("config should be an object, received type is " + type);
     merge(_crudConfigProxy, newConfig);
 }
@@ -241,6 +250,7 @@ function cdom(tagName) {
                 $dom.textContent = val.toString();
                 break;
             case "html":
+                // eslint-disable-next-line no-unsanitized/property
                 $dom.innerHTML += val.toString();
                 break;
             case "doms":
@@ -314,8 +324,10 @@ function udom($dom) {
                 break;
             case "html":
                 _udomBySign(sign, function () {
+                    // eslint-disable-next-line no-unsanitized/property
                     $dom.innerHTML = val.toString();
                 }, function () {
+                    // eslint-disable-next-line no-unsanitized/property
                     $dom.innerHTML += val.toString();
                 }, function () {
                     $dom.innerHTML = "";
@@ -353,13 +365,13 @@ function ddom($dom) {
         return true;
     }
     else {
-        _console.warn('ddom', "you passed an invalid parameter(type is " + getType($dom) + "), ddom removed nothing");
+        _console.warn("ddom", "you passed an invalid parameter(type is " + getType($dom) + "), ddom removed nothing");
         return false;
     }
 }
 function _appendDoms($container, doms, beforeTag) {
-    if (beforeTag === void 0) { beforeTag = ""; }
     var e_1, _a, e_2, _b, e_3, _c;
+    if (beforeTag === void 0) { beforeTag = ""; }
     if (!isValidDomsValue(doms))
         throw new TypeError("when key is 'doms', value should be array/array-like and from one of Element[], HTMLCollection, NodeList");
     if (beforeTag && beforeTag === "script") {
@@ -423,7 +435,7 @@ function _removeDoms($container, doms) {
             if (dom.parentNode == $container)
                 dom.remove();
             else {
-                _console.warn('_removeDoms', "encountered a dom that is not a child dom, removing skipped");
+                _console.warn("_removeDoms", "encountered a dom that is not a child dom, removing skipped");
             }
         }
     }

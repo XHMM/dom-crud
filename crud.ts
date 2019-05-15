@@ -1,10 +1,5 @@
-import {
-  stringToDomClasses,
-  toKVSEntries,
-  isValidDomsValue,
-  Sign, getType
-} from "./helpers";
-import {readConfigByKey, _console} from "./config";
+import { stringToDomClasses, toKVSEntries, isValidDomsValue, Sign, getType } from "./helpers";
+import { readConfigByKey, _console } from "./config";
 
 interface ISignHandler {
   (): void;
@@ -12,10 +7,7 @@ interface ISignHandler {
 
 // creating dom not affected by signs:  class-=a is equal to class=a
 // when dom and html exist at the same time, content will be added in order
-function cdom(
-  tagName: string,
-  ...options: Array<string | Record<string, any>>
-): HTMLElement {
+function cdom(tagName: string, ...options: Array<string | Record<string, any>>): HTMLElement {
   const $dom = document.createElement(tagName);
   let keyValSignEntries = toKVSEntries(options);
   keyValSignEntries.map(option => {
@@ -31,6 +23,7 @@ function cdom(
         $dom.textContent = val.toString();
         break;
       case "html":
+        // eslint-disable-next-line no-unsanitized/property
         $dom.innerHTML += val.toString();
         break;
       case "doms":
@@ -47,7 +40,7 @@ function cdom(
 // you can chain rdom
 function rdom<E extends Element = Element>(selector: string): E | null {
   const $dom = document.querySelector<E>(selector);
-  if($dom) {
+  if ($dom) {
     // @ts-ignore
     $dom.rdom = $dom.querySelector;
     return $dom;
@@ -61,10 +54,7 @@ function rdoms<E extends Element = Element>(selector: string): NodeListOf<E> {
 
 // when removing(-=), just write 'key-=' or {'key-':''}
 // you can chain udom
-function udom(
-  $dom: HTMLElement,
-  ...options: Array<string | Record<string, any>>
-): HTMLElement {
+function udom($dom: HTMLElement, ...options: Array<string | Record<string, any>>): HTMLElement {
   let keyValSignEntries = toKVSEntries(options);
   keyValSignEntries.map(option => {
     const [key, val, sign] = option;
@@ -119,9 +109,11 @@ function udom(
         _udomBySign(
           sign,
           () => {
+            // eslint-disable-next-line no-unsanitized/property
             $dom.innerHTML = val.toString();
           },
           () => {
+            // eslint-disable-next-line no-unsanitized/property
             $dom.innerHTML += val.toString();
           },
           () => {
@@ -164,22 +156,17 @@ function udom(
   return $dom;
 }
 
-function ddom($dom: HTMLElement|null): boolean {
-  if($dom instanceof Element) {
+function ddom($dom: HTMLElement | null): boolean {
+  if ($dom instanceof Element) {
     $dom.remove();
-    return true
-  }
-  else {
-    _console.warn('ddom',`you passed an invalid parameter(type is ${getType($dom)}), ddom removed nothing`)
-    return false
+    return true;
+  } else {
+    _console.warn("ddom", `you passed an invalid parameter(type is ${getType($dom)}), ddom removed nothing`);
+    return false;
   }
 }
 
-function _appendDoms(
-  $container: Element,
-  doms: unknown,
-  beforeTag: "script" | Element | "" = ""
-) {
+function _appendDoms($container: Element, doms: unknown, beforeTag: "script" | Element | "" = ""): void {
   if (!isValidDomsValue(doms))
     throw new TypeError(
       `when key is 'doms', value should be array/array-like and from one of Element[], HTMLCollection, NodeList`
@@ -202,7 +189,7 @@ function _appendDoms(
     }
   }
 }
-function _removeDoms($container: Element, doms: unknown) {
+function _removeDoms($container: Element, doms: unknown): void {
   if (!isValidDomsValue(doms))
     throw new TypeError(
       `when key is 'doms', value should be array/array-like and from one of Element[], HTMLCollection, NodeList`
@@ -211,7 +198,7 @@ function _removeDoms($container: Element, doms: unknown) {
   for (const dom of doms) {
     if (dom.parentNode == $container) dom.remove();
     else {
-      _console.warn('_removeDoms',`encountered a dom that is not a child dom, removing skipped`);
+      _console.warn("_removeDoms", `encountered a dom that is not a child dom, removing skipped`);
     }
   }
 }
@@ -220,7 +207,7 @@ function _udomBySign(
   overwriteHandler: ISignHandler,
   appendHandler: ISignHandler,
   removeHandler: ISignHandler
-) {
+): void {
   if (sign == "=") overwriteHandler();
   if (sign == "+=") appendHandler();
   if (sign == "-=") removeHandler();

@@ -14,7 +14,11 @@
   },
   "devDependencies": {
     "@types/jest": "^24.0.11",
+    "eslint": "^5.16.0",
+    "eslint-config-xhmm": "^0.0.7",
     "jest": "^24.5.0",
+    "prettier": "^1.17.1",
+    "prettier-config-xhmm": "^0.0.4",
     "rollup": "^1.7.0",
     "rollup-plugin-commonjs": "^9.2.1",
     "rollup-plugin-delete": "^0.2.1",
@@ -23,7 +27,7 @@
     "rollup-plugin-terser": "^4.0.4",
     "rollup-plugin-typescript2": "^0.20.1",
     "ts-jest": "^24.0.0",
-    "typescript": "^3.3.4000"
+    "typescript": "^3.4.5"
   },
   "keywords": [
     "dom",
