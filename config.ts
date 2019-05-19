@@ -2,9 +2,9 @@ import { getType, merge } from "./helpers";
 
 interface ICrudConfig {
   text: {
-    pureText: boolean
-  }
-  debug: boolean
+    pureText: boolean;
+  };
+  debug: boolean;
 }
 interface IConsole {
   log(methodName: string, msg: any): void;
