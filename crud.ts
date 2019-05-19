@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion,no-unsanitized/property */
 import { stringToDomClasses, toKVSEntries, isValidDomsValue, Sign, getType } from "./helpers";
 import { readConfigByKey, _console } from "./config";
 
@@ -39,7 +40,7 @@ function cdom(tagName: string, ...options: Array<string | Record<string, any>>):
 // you can chain rdom
 function rdom<E extends Element = Element>(selector: string): E | null {
   const $dom = document.querySelector<E>(selector);
-  if($dom) {
+  if ($dom) {
     // @ts-ignore
     $dom.rdom = $dom.querySelector;
     return $dom;
@@ -51,7 +52,7 @@ function rdoms<E extends Element = Element>(selector: string): NodeListOf<E> {
   return document.querySelectorAll<E>(selector);
 }
 
-// when removing(-=), just write 'key-=' or {'key-':''}
+// when removing(-=), just write 'key-=' or {'key-=':''}
 // you can chain udom
 function udom($dom: HTMLElement, ...options: Array<string | Record<string, any>>): HTMLElement {
   let keyValSignEntries = toKVSEntries(options);
@@ -91,26 +92,20 @@ function udom($dom: HTMLElement, ...options: Array<string | Record<string, any>>
         );
         break;
       case "text":
-        const isPureText = ('pureTex' in config) ?config.pureText : readConfigByKey('text').pureText;
+        const isPureText = "pureTex" in config ? config.pureText : readConfigByKey("text").pureText;
         _udomBySign(
           sign,
           () => {
-            if(isPureText)
-              ($dom.firstChild! as Text).data = value.toString();
-            else
-              $dom.textContent = value.toString();
+            if (isPureText) ($dom.firstChild! as Text).data = value.toString();
+            else $dom.textContent = value.toString();
           },
           () => {
-            if(isPureText)
-              ($dom.firstChild! as Text).data += value.toString();
-            else
-              $dom.textContent += value.toString();
+            if (isPureText) ($dom.firstChild! as Text).data += value.toString();
+            else $dom.textContent += value.toString();
           },
           () => {
-            if(isPureText)
-              ($dom.firstChild! as Text).data = '';
-            else
-              $dom.textContent = '';
+            if (isPureText) ($dom.firstChild! as Text).data = "";
+            else $dom.textContent = "";
           }
         );
         break;
@@ -136,7 +131,7 @@ function udom($dom: HTMLElement, ...options: Array<string | Record<string, any>>
             _appendDoms($dom, value, null);
           },
           () => {
-            console.log(config)
+            console.log(config);
             _appendDoms($dom, value, config.before || null);
           },
           () => {
@@ -172,17 +167,13 @@ function ddom($dom: HTMLElement | null): boolean {
   }
 }
 
-function _appendDoms(
-  $container: Element,
-  doms: unknown,
-  beforeElement: Element | null
-) {
+function _appendDoms($container: Element, doms: unknown, beforeElement: Element | null): void {
   if (!isValidDomsValue(doms))
     throw new TypeError(
       `when key is 'doms', value should be array/array-like and from one of Element[], HTMLCollection, NodeList`
     );
   if (beforeElement && beforeElement instanceof Element) {
-    if(!$container.contains(beforeElement)) throw new Error('beForeElement not exist in containerElement')
+    if (!$container.contains(beforeElement)) throw new Error("beForeElement not exist in containerElement");
     // @ts-ignore
     for (const dom of doms) {
       $container.insertBefore(dom, beforeElement);
@@ -212,7 +203,7 @@ function _udomBySign(
   overwriteHandler: ISignHandler,
   appendHandler: ISignHandler,
   removeHandler: ISignHandler
-) {
+): void {
   if (sign == "==") overwriteHandler();
   if (sign == "+=") appendHandler();
   if (sign == "-=") removeHandler();

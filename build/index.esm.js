@@ -111,15 +111,15 @@ cdom('div',
 * */
 function _stringToKVSCEntry(str) {
     var res;
-    var sign = '';
+    var sign = "";
     if (str.includes("-=")) {
-        sign = '-=';
+        sign = "-=";
     }
     else if (str.includes("+=")) {
-        sign = '+=';
+        sign = "+=";
     }
     else if (str.includes("==")) {
-        sign = '==';
+        sign = "==";
     }
     if (sign) {
         var idx = str.indexOf(sign);
@@ -142,33 +142,34 @@ function _objectToKVSEntry(obj) {
         Object.entries(obj).map(function (item) {
             var key = item[0];
             var value = item[1];
-            var sign = '';
+            var sign = "";
             if (key.endsWith("-=")) {
-                sign = '-=';
+                sign = "-=";
             }
             else if (key.endsWith("+=")) {
-                sign = '+=';
+                sign = "+=";
             }
             else if (key.endsWith("==")) {
-                sign = '==';
+                sign = "==";
             }
             if (sign) {
                 var k = key.match(/.+(?=[-+=]=)/)[0];
                 var v = void 0, c = void 0;
                 var valueType = getType(value);
-                if (valueType === 'string') {
+                if (valueType === "string") {
                     var vc = _vcStringToObject(value);
                     v = vc.v;
                     c = vc.c;
                 }
-                else if (valueType === 'object') {
+                else if (valueType === "object") {
                     if (!value.value) {
                         throw new Error("options item format not correct");
                     }
                     v = value.value;
                     c = value.config || {};
                 }
-                else { // eg: {'doms+=': [xx, xx] }
+                else {
+                    // eg: {'doms+=': [xx, xx] }
                     v = value;
                     c = {};
                 }
@@ -185,7 +186,7 @@ function _objectToKVSEntry(obj) {
     }
 }
 function _vcStringToObject(str) {
-    var v = '', c = {};
+    var v = "", c = {};
     var vc = str.trim().match(/(.*)\?([0-9a-zA-Z&=]*)/); // 不能写成 /(.+) .../  因为当value传入了空内容时会导致匹配出错
     // 为null表示没有配置项
     if (vc === null) {
@@ -193,12 +194,12 @@ function _vcStringToObject(str) {
     }
     else if (vc && vc.length === 3) {
         v = vc[1];
-        c = vc[2].split('&').reduce(function (acc, cur) {
-            var arr = cur.split('=');
+        c = vc[2].split("&").reduce(function (acc, cur) {
+            var arr = cur.split("=");
             var value;
-            if (arr[1] === 'true')
+            if (arr[1] === "true")
                 value = true;
-            else if (arr[1] === 'false')
+            else if (arr[1] === "false")
                 value = false;
             else if (arr[1].match(/[0-9]+/g))
                 value = +arr[1];
@@ -208,7 +209,8 @@ function _vcStringToObject(str) {
         }, {});
     }
     return {
-        v: v, c: c
+        v: v,
+        c: c
     };
 }
 // below function not deal with KVS's  V part, it should be dealt depend on key in cdom/udom
@@ -404,7 +406,7 @@ function udom($dom) {
                 });
                 break;
             case "text":
-                var isPureText_1 = ('pureTex' in config) ? config.pureText : readConfigByKey('text').pureText;
+                var isPureText_1 = "pureTex" in config ? config.pureText : readConfigByKey("text").pureText;
                 _udomBySign(sign, function () {
                     if (isPureText_1)
                         $dom.firstChild.data = value.toString();
@@ -417,9 +419,9 @@ function udom($dom) {
                         $dom.textContent += value.toString();
                 }, function () {
                     if (isPureText_1)
-                        $dom.firstChild.data = '';
+                        $dom.firstChild.data = "";
                     else
-                        $dom.textContent = '';
+                        $dom.textContent = "";
                 });
                 break;
             case "html":
@@ -470,7 +472,7 @@ function _appendDoms($container, doms, beforeElement) {
         throw new TypeError("when key is 'doms', value should be array/array-like and from one of Element[], HTMLCollection, NodeList");
     if (beforeElement && beforeElement instanceof Element) {
         if (!$container.contains(beforeElement))
-            throw new Error('beForeElement not exist in containerElement');
+            throw new Error("beForeElement not exist in containerElement");
         try {
             // @ts-ignore
             for (var doms_1 = __values(doms), doms_1_1 = doms_1.next(); !doms_1_1.done; doms_1_1 = doms_1.next()) {
