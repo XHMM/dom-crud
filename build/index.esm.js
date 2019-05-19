@@ -49,7 +49,7 @@ function __spread() {
 
 // export type ValidTypeValue = xx
 // export type ValidXxxValue = xx
-/*---------------------------------------------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 // return type string: array string function null...
 function getType(val) {
     var rightPart = Object.prototype.toString.call(val).split(" ")[1];
@@ -72,42 +72,135 @@ function isValidDomsValue(val) {
     else
         return type === "nodelist" || type === "htmlcollection";
 }
-// function _isValidTypeValue() ...
-// function _isValidXxxValue() ...
-function _stringToKVSEntry(str) {
+// function isValidTypeValue() ...
+// function isValidXxxValue() ...
+/*
+cdom('div',
+  {
+    'doms+=': {
+      value: [cdom('div', 'text==hi!')], // value必须存在，值可为任意类型
+      config: { // config可有可无
+       ca:xx,
+       cb:xx
+      }
+    },
+    "text==": {
+      value:'hi'
+    }
+   'text+=': 'hi',
+   'style+=': 'hi?configA=xx'
+  },
+
+  'text+=hi?configA=xx&configB=xx'
+)
+
+ ===>
+
+ ['doms', value, '+=',  { configA:xx, configB:xx}]
+ 其中value因ley而异，可能去任何类型的值
+
+* */
+function _stringToKVSCEntry(str) {
     var res;
+    var sign = '';
     if (str.includes("-=")) {
-        var idx = str.indexOf("-=");
-        res = [str.slice(0, idx).trim(), str.slice(idx + 2).trim(), "-="];
+        sign = '-=';
     }
     else if (str.includes("+=")) {
-        var idx = str.indexOf("+=");
-        res = [str.slice(0, idx).trim(), str.slice(idx + 2).trim(), "+="];
+        sign = '+=';
     }
-    else if (str.includes("=")) {
-        var idx = str.indexOf("=");
-        res = [str.slice(0, idx).trim(), str.slice(idx + 1).trim(), "="];
+    else if (str.includes("==")) {
+        sign = '==';
     }
-    // @ts-ignore
-    if (res.length !== 3) {
-        throw new Error("options item not match key=val or key-=val or key+=val");
+    if (sign) {
+        var idx = str.indexOf(sign);
+        var k = str.slice(0, idx).trim();
+        var vc = _vcStringToObject(str.slice(idx + 2));
+        res = [k, vc.v, sign, vc.c];
+        if (res.length !== 4) {
+            throw new Error("options item format not correct");
+        }
+        else
+            return res;
     }
-    // @ts-ignore
-    return res;
+    else {
+        throw new Error("options item format not correct");
+    }
 }
 function _objectToKVSEntry(obj) {
     var res = [];
-    Object.entries(obj).map(function (item) {
-        if (item[0].endsWith("-")) {
-            res.push([item[0].slice(0, item[0].length - 1), item[1], "-="]);
-        }
-        else if (item[0].endsWith("+")) {
-            res.push([item[0].slice(0, item[0].length - 1), item[1], "+="]);
-        }
-        else
-            res.push([item[0], item[1], "="]);
-    });
-    return res;
+    try {
+        Object.entries(obj).map(function (item) {
+            var key = item[0];
+            var value = item[1];
+            var sign = '';
+            if (key.endsWith("-=")) {
+                sign = '-=';
+            }
+            else if (key.endsWith("+=")) {
+                sign = '+=';
+            }
+            else if (key.endsWith("==")) {
+                sign = '==';
+            }
+            if (sign) {
+                var k = key.match(/.+(?=[-+=]=)/)[0];
+                var v = void 0, c = void 0;
+                var valueType = getType(value);
+                if (valueType === 'string') {
+                    var vc = _vcStringToObject(value);
+                    v = vc.v;
+                    c = vc.c;
+                }
+                else if (valueType === 'object') {
+                    if (!value.value) {
+                        throw new Error("options item format not correct");
+                    }
+                    v = value.value;
+                    c = value.config || {};
+                }
+                else { // eg: {'doms+=': [xx, xx] }
+                    v = value;
+                    c = {};
+                }
+                res.push([k, v, sign, c]);
+            }
+            else {
+                throw new Error("options item format not correct");
+            }
+        });
+        return res;
+    }
+    catch (e) {
+        throw e;
+    }
+}
+function _vcStringToObject(str) {
+    var v = '', c = {};
+    var vc = str.trim().match(/(.*)\?([0-9a-zA-Z&=]*)/); // 不能写成 /(.+) .../  因为当value传入了空内容时会导致匹配出错
+    // 为null表示没有配置项
+    if (vc === null) {
+        v = str;
+    }
+    else if (vc && vc.length === 3) {
+        v = vc[1];
+        c = vc[2].split('&').reduce(function (acc, cur) {
+            var arr = cur.split('=');
+            var value;
+            if (arr[1] === 'true')
+                value = true;
+            else if (arr[1] === 'false')
+                value = false;
+            else if (arr[1].match(/[0-9]+/g))
+                value = +arr[1];
+            else
+                acc[arr[0]] = arr[1];
+            return acc;
+        }, {});
+    }
+    return {
+        v: v, c: c
+    };
 }
 // below function not deal with KVS's  V part, it should be dealt depend on key in cdom/udom
 function toKVSEntries(options) {
@@ -117,7 +210,7 @@ function toKVSEntries(options) {
         for (var options_1 = __values(options), options_1_1 = options_1.next(); !options_1_1.done; options_1_1 = options_1.next()) {
             var option = options_1_1.value;
             if (getType(option) == "string") {
-                res.push(_stringToKVSEntry(option));
+                res.push(_stringToKVSCEntry(option));
             }
             else if (getType(option) == "object") {
                 res.push.apply(res, __spread(_objectToKVSEntry(option)));
@@ -133,7 +226,7 @@ function toKVSEntries(options) {
     }
     return res;
 }
-// only merge attributes target exist
+// merge attributes if target and source both have
 function merge(target, source) {
     var targetType = getType(target);
     var sourceType = getType(source);
@@ -157,10 +250,8 @@ function merge(target, source) {
 
 // this object must have at most two level depth, must can to be a  valid JSON
 var _crudConfig = {
-    doms: {
-        "+=": {
-            beforeScript: false
-        }
+    text: {
+        pureText: false
     },
     debug: false
 };
@@ -215,10 +306,10 @@ function readConfigByKey(key) {
         return _crudConfig[key];
     }
     else
-        throw new Error(key + " not exists in global curd config");
+        throw new Error(key + " not exists in global crud config");
 }
 
-// creating dom not affected by signs:  class-=a is equal to class=a
+// creating dom not affected by signs
 // when dom and html exist at the same time, content will be added in order
 function cdom(tagName) {
     var options = [];
@@ -229,7 +320,7 @@ function cdom(tagName) {
     var keyValSignEntries = toKVSEntries(options);
     keyValSignEntries.map(function (option) {
         var _a;
-        var _b = __read(option, 2), key = _b[0], val = _b[1];
+        var _b = __read(option, 4), key = _b[0], val = _b[1], sign = _b[2], config = _b[3];
         switch (key) {
             case "class":
                 (_a = $dom.classList).add.apply(_a, __spread(stringToDomClasses(val.toString())));
@@ -241,10 +332,10 @@ function cdom(tagName) {
                 $dom.textContent = val.toString();
                 break;
             case "html":
-                $dom.innerHTML += val.toString();
+                $dom.innerHTML = val.toString();
                 break;
             case "doms":
-                _appendDoms($dom, val);
+                _appendDoms($dom, val, null);
                 break;
             default:
                 $dom.setAttribute(key, val.toString());
@@ -256,9 +347,12 @@ function cdom(tagName) {
 // you can chain rdom
 function rdom(selector) {
     var $dom = document.querySelector(selector);
-    // @ts-ignore
-    $dom.rdom = $dom.querySelector;
-    return $dom;
+    if ($dom) {
+        // @ts-ignore
+        $dom.rdom = $dom.querySelector;
+        return $dom;
+    }
+    return null;
 }
 // rdoms cannot chain
 function rdoms(selector) {
@@ -273,47 +367,57 @@ function udom($dom) {
     }
     var keyValSignEntries = toKVSEntries(options);
     keyValSignEntries.map(function (option) {
-        var _a = __read(option, 3), key = _a[0], val = _a[1], sign = _a[2];
+        var _a = __read(option, 4), key = _a[0], value = _a[1], sign = _a[2], config = _a[3];
         switch (key) {
             case "class":
                 _udomBySign(sign, function () {
                     var _a;
                     $dom.className = "";
-                    (_a = $dom.classList).add.apply(_a, __spread(stringToDomClasses(val.toString())));
+                    (_a = $dom.classList).add.apply(_a, __spread(stringToDomClasses(value.toString())));
                 }, function () {
                     var _a;
-                    (_a = $dom.classList).add.apply(_a, __spread(stringToDomClasses(val.toString())));
+                    (_a = $dom.classList).add.apply(_a, __spread(stringToDomClasses(value.toString())));
                 }, function () {
                     var _a;
-                    (_a = $dom.classList).remove.apply(_a, __spread(stringToDomClasses(val.toString())));
+                    (_a = $dom.classList).remove.apply(_a, __spread(stringToDomClasses(value.toString())));
                 });
                 break;
             case "style":
                 _udomBySign(sign, function () {
-                    $dom.style.cssText = val.toString();
+                    $dom.style.cssText = value.toString();
                 }, function () {
-                    $dom.style.cssText += val.toString();
+                    $dom.style.cssText += value.toString();
                 }, function () {
-                    var styleProperties = val.toString().split(";");
+                    var styleProperties = value.toString().split(";");
                     styleProperties.map(function (item) {
                         $dom.style.removeProperty(item);
                     });
                 });
                 break;
             case "text":
+                var isPureText_1 = ('pureTex' in config) ? config.pureText : readConfigByKey('text').pureText;
                 _udomBySign(sign, function () {
-                    $dom.textContent = val.toString();
+                    if (isPureText_1)
+                        $dom.firstChild.data = value.toString();
+                    else
+                        $dom.textContent = value.toString();
                 }, function () {
-                    $dom.textContent += val.toString();
+                    if (isPureText_1)
+                        $dom.firstChild.data += value.toString();
+                    else
+                        $dom.textContent += value.toString();
                 }, function () {
-                    $dom.textContent = "";
+                    if (isPureText_1)
+                        $dom.firstChild.data = '';
+                    else
+                        $dom.textContent = '';
                 });
                 break;
             case "html":
                 _udomBySign(sign, function () {
-                    $dom.innerHTML = val.toString();
+                    $dom.innerHTML = value.toString();
                 }, function () {
-                    $dom.innerHTML += val.toString();
+                    $dom.innerHTML += value.toString();
                 }, function () {
                     $dom.innerHTML = "";
                 });
@@ -321,22 +425,19 @@ function udom($dom) {
             case "doms":
                 _udomBySign(sign, function () {
                     $dom.innerHTML = "";
-                    _appendDoms($dom, val);
+                    _appendDoms($dom, value, null);
                 }, function () {
-                    var config = readConfigByKey("doms");
-                    if (config["+="].beforeScript)
-                        _appendDoms($dom, val, "script");
-                    else
-                        _appendDoms($dom, val);
+                    console.log(config);
+                    _appendDoms($dom, value, config.before || null);
                 }, function () {
-                    _removeDoms($dom, val);
+                    _removeDoms($dom, value);
                 });
                 break;
             default:
                 _udomBySign(sign, function () {
-                    $dom.setAttribute(key, val.toString());
+                    $dom.setAttribute(key, value.toString());
                 }, function () {
-                    $dom.setAttribute(key, val.toString());
+                    $dom.setAttribute(key, value.toString());
                 }, function () {
                     $dom.removeAttribute(key);
                 });
@@ -354,18 +455,18 @@ function ddom($dom) {
         return false;
     }
 }
-function _appendDoms($container, doms, beforeTag) {
-    if (beforeTag === void 0) { beforeTag = ""; }
-    var e_1, _a, e_2, _b, e_3, _c;
+function _appendDoms($container, doms, beforeElement) {
+    var e_1, _a, e_2, _b;
     if (!isValidDomsValue(doms))
         throw new TypeError("when key is 'doms', value should be array/array-like and from one of Element[], HTMLCollection, NodeList");
-    if (beforeTag && beforeTag === "script") {
-        var $script = $container.querySelector("script");
+    if (beforeElement && beforeElement instanceof Element) {
+        if (!$container.contains(beforeElement))
+            throw new Error('beForeElement not exist in containerElement');
         try {
             // @ts-ignore
             for (var doms_1 = __values(doms), doms_1_1 = doms_1.next(); !doms_1_1.done; doms_1_1 = doms_1.next()) {
                 var dom = doms_1_1.value;
-                $container.insertBefore(dom, $script);
+                $container.insertBefore(dom, beforeElement);
             }
         }
         catch (e_1_1) { e_1 = { error: e_1_1 }; }
@@ -376,12 +477,12 @@ function _appendDoms($container, doms, beforeTag) {
             finally { if (e_1) throw e_1.error; }
         }
     }
-    else if (beforeTag && beforeTag instanceof Element) {
+    else {
         try {
             // @ts-ignore
             for (var doms_2 = __values(doms), doms_2_1 = doms_2.next(); !doms_2_1.done; doms_2_1 = doms_2.next()) {
                 var dom = doms_2_1.value;
-                $container.insertBefore(dom, beforeTag);
+                $container.appendChild(dom);
             }
         }
         catch (e_2_1) { e_2 = { error: e_2_1 }; }
@@ -392,31 +493,15 @@ function _appendDoms($container, doms, beforeTag) {
             finally { if (e_2) throw e_2.error; }
         }
     }
-    else {
-        try {
-            // @ts-ignore
-            for (var doms_3 = __values(doms), doms_3_1 = doms_3.next(); !doms_3_1.done; doms_3_1 = doms_3.next()) {
-                var dom = doms_3_1.value;
-                $container.appendChild(dom);
-            }
-        }
-        catch (e_3_1) { e_3 = { error: e_3_1 }; }
-        finally {
-            try {
-                if (doms_3_1 && !doms_3_1.done && (_c = doms_3.return)) _c.call(doms_3);
-            }
-            finally { if (e_3) throw e_3.error; }
-        }
-    }
 }
 function _removeDoms($container, doms) {
-    var e_4, _a;
+    var e_3, _a;
     if (!isValidDomsValue(doms))
         throw new TypeError("when key is 'doms', value should be array/array-like and from one of Element[], HTMLCollection, NodeList");
     try {
         // @ts-ignore
-        for (var doms_4 = __values(doms), doms_4_1 = doms_4.next(); !doms_4_1.done; doms_4_1 = doms_4.next()) {
-            var dom = doms_4_1.value;
+        for (var doms_3 = __values(doms), doms_3_1 = doms_3.next(); !doms_3_1.done; doms_3_1 = doms_3.next()) {
+            var dom = doms_3_1.value;
             if (dom.parentNode == $container)
                 dom.remove();
             else {
@@ -424,16 +509,16 @@ function _removeDoms($container, doms) {
             }
         }
     }
-    catch (e_4_1) { e_4 = { error: e_4_1 }; }
+    catch (e_3_1) { e_3 = { error: e_3_1 }; }
     finally {
         try {
-            if (doms_4_1 && !doms_4_1.done && (_a = doms_4.return)) _a.call(doms_4);
+            if (doms_3_1 && !doms_3_1.done && (_a = doms_3.return)) _a.call(doms_3);
         }
-        finally { if (e_4) throw e_4.error; }
+        finally { if (e_3) throw e_3.error; }
     }
 }
 function _udomBySign(sign, overwriteHandler, appendHandler, removeHandler) {
-    if (sign == "=")
+    if (sign == "==")
         overwriteHandler();
     if (sign == "+=")
         appendHandler();

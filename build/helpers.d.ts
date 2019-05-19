@@ -1,10 +1,10 @@
-export declare type Sign = "=" | "+=" | "-=";
-export declare type KVSEntryFromString = [string, string, Sign];
-export declare type KVSEntryFromObject = [string, any, Sign];
+export declare type Sign = "==" | "+=" | "-=";
+export declare type KVSCEntryFromString = [string, string, Sign, Record<string, any>];
+export declare type KVSCEntryFromObject = [string, any, Sign, Record<string, any>];
 export declare type ValidDomsValue = Element[] | NodeList | HTMLCollection;
 declare function getType(val: any): string;
 declare function stringToDomClasses(str: string): string[];
 declare function isValidDomsValue(val: any): any;
-declare function toKVSEntries(options: any[]): Array<KVSEntryFromString | KVSEntryFromObject>;
+declare function toKVSEntries(options: any[]): Array<KVSCEntryFromString | KVSCEntryFromObject>;
 declare function merge(target: any, source: any): void;
 export { getType, stringToDomClasses, isValidDomsValue, toKVSEntries, merge };

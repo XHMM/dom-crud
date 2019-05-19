@@ -1,11 +1,9 @@
 import {getType, merge} from "./helpers";
 
 interface ICrudConfig {
-  doms: {
-    "+=": {
-      beforeScript: boolean;
-    };
-  };
+  text: {
+    pureText: boolean
+  }
   debug: boolean
 }
 interface IConsole {
@@ -17,10 +15,8 @@ interface IConsole {
 
 // this object must have at most two level depth, must can to be a  valid JSON
 const _crudConfig: ICrudConfig = {
-  doms: {
-    "+=": {
-      beforeScript: true
-    }
+  text: {
+    pureText: false
   },
   debug: false
 };
@@ -75,7 +71,7 @@ function readConfigByKey(key: string) {
   if (key in _crudConfig && _crudConfig.hasOwnProperty(key)) {
     // @ts-ignore
     return _crudConfig[key];
-  } else throw new Error(`${key} not exists in global curd config`);
+  } else throw new Error(`${key} not exists in global crud config`);
 }
 
 export { getCrudConfig, updateCrudConfig, readConfigByKey, _console };

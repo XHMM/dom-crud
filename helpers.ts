@@ -1,16 +1,29 @@
-export type Sign = "=" | "+=" | "-=";
+export type Sign = "==" | "+=" | "-=";
 
-// we call xx=aa xx-=aa xx+=aa xx-= xx+= xx= KVS string
-// we call [xx, yy, sign] KVS entry
-export type KVSEntryFromString = [string, string, Sign];
-export type KVSEntryFromObject = [string, any, Sign];
+/*
+KVSC string:
+xx==aa
+xx-=aa
+x-=aa
+xx+=aa
+xx=aa?configA=xx&configB=xx
 
-// define accepted valid type for V(value) in KVS
+KVSC entry
+[xx, yy, sign, {xx"xx}]
+[xx, yy, sign, {}]
+
+K,V,S 必不为空字符串
+C 可为空对象
+* */
+export type KVSCEntryFromString = [string, string, Sign, Record<string, any>];
+export type KVSCEntryFromObject = [string, any, Sign, Record<string, any>];
+
+// define accepted valid type for V(value) in KVSC
 export type ValidDomsValue = Element[] | NodeList | HTMLCollection;
 // export type ValidTypeValue = xx
 // export type ValidXxxValue = xx
 
-/*---------------------------------------------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
 // return type string: array string function null...
 function getType(val: any): string {
@@ -34,47 +47,133 @@ function isValidDomsValue(val: any) {
   if(type ==='array') return val.every((item:any) => (item instanceof Element))
   else return type === "nodelist" || type === "htmlcollection";
 }
-// function _isValidTypeValue() ...
-// function _isValidXxxValue() ...
+// function isValidTypeValue() ...
+// function isValidXxxValue() ...
 
-function _stringToKVSEntry(str: string): KVSEntryFromString {
-  let res: KVSEntryFromString;
+/*
+cdom('div',
+  {
+    'doms+=': {
+      value: [cdom('div', 'text==hi!')], // value必须存在，值可为任意类型
+      config: { // config可有可无
+       ca:xx,
+       cb:xx
+      }
+    },
+    "text==": {
+      value:'hi'
+    }
+   'text+=': 'hi',
+   'style+=': 'hi?configA=xx'
+  },
+
+  'text+=hi?configA=xx&configB=xx'
+)
+
+ ===>
+
+ ['doms', value, '+=',  { configA:xx, configB:xx}]
+ 其中value因ley而异，可能去任何类型的值
+
+* */
+function _stringToKVSCEntry(str: string): KVSCEntryFromString {
+  let res: KVSCEntryFromString;
+  let sign:Sign|'' = '';
+
   if (str.includes("-=")) {
-    const idx = str.indexOf("-=");
-    res = [str.slice(0, idx).trim(), str.slice(idx + 2).trim(), "-="];
+    sign = '-='
   } else if (str.includes("+=")) {
-    const idx = str.indexOf("+=");
-    res = [str.slice(0, idx).trim(), str.slice(idx + 2).trim(), "+="];
-  } else if (str.includes("=")) {
-    const idx = str.indexOf("=");
-    res = [str.slice(0, idx).trim(), str.slice(idx + 1).trim(), "="];
+    sign = '+='
+  } else if (str.includes("==")) {
+    sign = '=='
   }
-  // @ts-ignore
-  if (res.length !== 3) {
-    throw new Error("options item not match key=val or key-=val or key+=val");
+  if(sign) {
+    const idx = str.indexOf(sign);
+    const k = str.slice(0, idx).trim();
+    const vc = _vcStringToObject(str.slice(idx + 2))
+    res = [k, vc.v, sign, vc.c];
+    if (res.length !== 4) {
+      throw new Error("options item format not correct");
+    } else
+      return res;
+  } else {
+    throw new Error("options item format not correct");
   }
-  // @ts-ignore
-  return res;
 }
-function _objectToKVSEntry(obj: Record<string, any>): KVSEntryFromObject[] {
-  let res: KVSEntryFromObject[] = [];
-  Object.entries(obj).map(item => {
-    if (item[0].endsWith("-")) {
-      res.push([item[0].slice(0, item[0].length - 1), item[1], "-="]);
-    } else if (item[0].endsWith("+")) {
-      res.push([item[0].slice(0, item[0].length - 1), item[1], "+="]);
-    } else res.push([item[0], item[1], "="]);
-  });
-  return res;
+function _objectToKVSEntry(obj: Record<string, any>): KVSCEntryFromObject[] {
+  let res: KVSCEntryFromObject[] = [];
+  try {
+    Object.entries(obj).map(item => {
+      let key = item[0];
+      let value = item[1];
+      let sign:Sign|'' = '';
+      if (key.endsWith("-=")) {
+        sign = '-=';
+      } else if (key.endsWith("+=")) {
+        sign = '+='
+      } else if (key.endsWith("==")) {
+        sign = '=='
+      }
+      if(sign) {
+        const k = key.match(/.+(?=[-+=]=)/)![0]
+        let v,c;
+        const valueType = getType(value);
+        if(valueType === 'string') {
+          const vc = _vcStringToObject(value);
+          v = vc.v;
+          c = vc.c;
+        } else if(valueType === 'object') {
+          if(!value.value) {
+            throw new Error("options item format not correct");
+          }
+          v = value.value;
+          c = value.config || {};
+        } else { // eg: {'doms+=': [xx, xx] }
+          v = value;
+          c = {};
+        }
+        res.push([k, v, sign, c]);
+      } else {
+        throw new Error("options item format not correct");
+      }
+    });
+    return res;
+  } catch (e) {
+    throw e;
+  }
 }
+function _vcStringToObject(str: string):{v: string, c: Record<string, string|boolean|number>} {
+  let v ='',c = {};
+  const vc = str.trim().match(/(.*)\?([0-9a-zA-Z&=]*)/); // 不能写成 /(.+) .../  因为当value传入了空内容时会导致匹配出错
+  // 为null表示没有配置项
+  if(vc === null) {
+    v = str;
+  }
+  else if(vc && vc.length === 3) {
+    v = vc[1];
+    c = vc[2].split('&').reduce((acc: Record<string, string|boolean|number>, cur) => {
+      const arr = cur.split('=')
+      let value;
+      if(arr[1] === 'true') value = true;
+      else if(arr[1] === 'false') value = false;
+      else if(arr[1].match(/[0-9]+/g)) value = +arr[1];
+      else acc[arr[0]] = arr[1];
+      return acc;
+    }, {})
+  }
+  return {
+    v,c
+  }
+}
+
 // below function not deal with KVS's  V part, it should be dealt depend on key in cdom/udom
 function toKVSEntries(
   options: any[]
-): Array<KVSEntryFromString | KVSEntryFromObject> {
+): Array<KVSCEntryFromString | KVSCEntryFromObject> {
   let res = [];
   for (const option of options) {
     if (getType(option) == "string") {
-      res.push(_stringToKVSEntry(option));
+      res.push(_stringToKVSCEntry(option));
     } else if (getType(option) == "object") {
       res.push(..._objectToKVSEntry(option));
     }
@@ -82,7 +181,7 @@ function toKVSEntries(
   return res;
 }
 
-// only merge attributes target exist
+// merge attributes if target and source both have
 function merge(target:any, source:any) {
   const targetType =getType(target);
   const sourceType = getType(source);

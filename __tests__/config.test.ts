@@ -6,11 +6,8 @@ import { getCrudConfig, updateCrudConfig, readConfigByKey } from "../config";
 describe("getCrudConfig", function() {
   test("get global crud config", () => {
     expect(getCrudConfig()).toEqual({
-      // copy
-      doms: {
-        "+=": {
-          beforeScript: true
-        }
+      text: {
+        pureText: false
       },
       debug: false
     });
@@ -18,14 +15,12 @@ describe("getCrudConfig", function() {
 });
 
 describe("readConfigByKey", function() {
-  test('get "doms" config from global config', () => {
-    expect(readConfigByKey("doms")).toEqual({
-      "+=": {
-        beforeScript: true
-      }
+  test('get "text" config from global config', () => {
+    expect(readConfigByKey("text")).toEqual({
+      pureText: false
     });
   });
-  test("when getting sub config, throw  if attribute not in global config", () => {
+  test("throw error if key not in global config", () => {
     expect(() => {
       readConfigByKey("ab");
     }).toThrow();
@@ -33,38 +28,31 @@ describe("readConfigByKey", function() {
 });
 
 describe("updateCrudConfig", function() {
-  test("global config not updated if passed obj not subset of global config", () => {
+  test("global config not updated if passed object not a subset of global config", () => {
     // @ts-ignore
-    updateCrudConfig({ doms: { "=": { hi: true } } });
+    updateCrudConfig({ text: { "newConfig": { hi: true } } });
     expect(getCrudConfig()).toEqual({
-      doms: {
-        "+=": {
-          beforeScript: true
-        }
+      text: {
+        pureText: false
       },
       debug: false
     });
   });
 
-  test('update "doms" config in global config', () => {
+  test('update "text" config in global config', () => {
     updateCrudConfig({
-      doms: {
-        "+=": {
-          beforeScript: false
-        }
+      text: {
+        pureText: true
       }
     });
     expect(getCrudConfig()).toEqual({
-      // copy
-      doms: {
-        "+=": {
-          beforeScript: false
-        }
+      text: {
+        pureText: true
       },
       debug: false
     });
   });
-  test("when updating global config, throw if passed parameter not an object", () => {
+  test("when updating global config, throw if parameter not an object", () => {
     expect(() => {
       // @ts-ignore
       updateCrudConfig("str");
