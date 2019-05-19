@@ -1,8 +1,6 @@
 interface ICrudConfig {
-    doms: {
-        "+=": {
-            beforeScript: boolean;
-        };
+    text: {
+        pureText: boolean;
     };
     debug: boolean;
 }

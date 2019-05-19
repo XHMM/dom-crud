@@ -1,6 +1,6 @@
 {
   "name": "dom-crud",
-  "version": "1.5.4",
+  "version": "2.0.0@alpha",
   "description": "let't crud dom but not database",
   "main": "./build/index.esm.js",
   "typings": "./build/index.d.ts",

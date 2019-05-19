@@ -5,13 +5,13 @@ interface ISignHandler {
   (): void;
 }
 
-// creating dom not affected by signs:  class-=a is equal to class=a
+// creating dom not affected by signs
 // when dom and html exist at the same time, content will be added in order
 function cdom(tagName: string, ...options: Array<string | Record<string, any>>): HTMLElement {
   const $dom = document.createElement(tagName);
   let keyValSignEntries = toKVSEntries(options);
   keyValSignEntries.map(option => {
-    const [key, val] = option;
+    const [key, val, sign, config] = option;
     switch (key) {
       case "class":
         $dom.classList.add(...stringToDomClasses(val.toString()));
@@ -23,11 +23,10 @@ function cdom(tagName: string, ...options: Array<string | Record<string, any>>):
         $dom.textContent = val.toString();
         break;
       case "html":
-        // eslint-disable-next-line no-unsanitized/property
-        $dom.innerHTML += val.toString();
+        $dom.innerHTML = val.toString();
         break;
       case "doms":
-        _appendDoms($dom, val);
+        _appendDoms($dom, val, null);
         break;
       default:
         $dom.setAttribute(key, val.toString());
@@ -40,7 +39,7 @@ function cdom(tagName: string, ...options: Array<string | Record<string, any>>):
 // you can chain rdom
 function rdom<E extends Element = Element>(selector: string): E | null {
   const $dom = document.querySelector<E>(selector);
-  if ($dom) {
+  if($dom) {
     // @ts-ignore
     $dom.rdom = $dom.querySelector;
     return $dom;
@@ -57,20 +56,20 @@ function rdoms<E extends Element = Element>(selector: string): NodeListOf<E> {
 function udom($dom: HTMLElement, ...options: Array<string | Record<string, any>>): HTMLElement {
   let keyValSignEntries = toKVSEntries(options);
   keyValSignEntries.map(option => {
-    const [key, val, sign] = option;
+    const [key, value, sign, config] = option;
     switch (key) {
       case "class":
         _udomBySign(
           sign,
           () => {
             $dom.className = "";
-            $dom.classList.add(...stringToDomClasses(val.toString()));
+            $dom.classList.add(...stringToDomClasses(value.toString()));
           },
           () => {
-            $dom.classList.add(...stringToDomClasses(val.toString()));
+            $dom.classList.add(...stringToDomClasses(value.toString()));
           },
           () => {
-            $dom.classList.remove(...stringToDomClasses(val.toString()));
+            $dom.classList.remove(...stringToDomClasses(value.toString()));
           }
         );
         break;
@@ -78,13 +77,13 @@ function udom($dom: HTMLElement, ...options: Array<string | Record<string, any>>
         _udomBySign(
           sign,
           () => {
-            $dom.style.cssText = val.toString();
+            $dom.style.cssText = value.toString();
           },
           () => {
-            $dom.style.cssText += val.toString();
+            $dom.style.cssText += value.toString();
           },
           () => {
-            const styleProperties = val.toString().split(";");
+            const styleProperties = value.toString().split(";");
             styleProperties.map((item: string) => {
               $dom.style.removeProperty(item);
             });
@@ -92,16 +91,26 @@ function udom($dom: HTMLElement, ...options: Array<string | Record<string, any>>
         );
         break;
       case "text":
+        const isPureText = ('pureTex' in config) ?config.pureText : readConfigByKey('text').pureText;
         _udomBySign(
           sign,
           () => {
-            $dom.textContent = val.toString();
+            if(isPureText)
+              ($dom.firstChild! as Text).data = value.toString();
+            else
+              $dom.textContent = value.toString();
           },
           () => {
-            $dom.textContent += val.toString();
+            if(isPureText)
+              ($dom.firstChild! as Text).data += value.toString();
+            else
+              $dom.textContent += value.toString();
           },
           () => {
-            $dom.textContent = "";
+            if(isPureText)
+              ($dom.firstChild! as Text).data = '';
+            else
+              $dom.textContent = '';
           }
         );
         break;
@@ -109,12 +118,10 @@ function udom($dom: HTMLElement, ...options: Array<string | Record<string, any>>
         _udomBySign(
           sign,
           () => {
-            // eslint-disable-next-line no-unsanitized/property
-            $dom.innerHTML = val.toString();
+            $dom.innerHTML = value.toString();
           },
           () => {
-            // eslint-disable-next-line no-unsanitized/property
-            $dom.innerHTML += val.toString();
+            $dom.innerHTML += value.toString();
           },
           () => {
             $dom.innerHTML = "";
@@ -126,15 +133,14 @@ function udom($dom: HTMLElement, ...options: Array<string | Record<string, any>>
           sign,
           () => {
             $dom.innerHTML = "";
-            _appendDoms($dom, val);
+            _appendDoms($dom, value, null);
           },
           () => {
-            const config = readConfigByKey("doms");
-            if (config["+="].beforeScript) _appendDoms($dom, val, "script");
-            else _appendDoms($dom, val);
+            console.log(config)
+            _appendDoms($dom, value, config.before || null);
           },
           () => {
-            _removeDoms($dom, val);
+            _removeDoms($dom, value);
           }
         );
         break;
@@ -142,10 +148,10 @@ function udom($dom: HTMLElement, ...options: Array<string | Record<string, any>>
         _udomBySign(
           sign,
           () => {
-            $dom.setAttribute(key, val.toString());
+            $dom.setAttribute(key, value.toString());
           },
           () => {
-            $dom.setAttribute(key, val.toString());
+            $dom.setAttribute(key, value.toString());
           },
           () => {
             $dom.removeAttribute(key);
@@ -166,21 +172,20 @@ function ddom($dom: HTMLElement | null): boolean {
   }
 }
 
-function _appendDoms($container: Element, doms: unknown, beforeTag: "script" | Element | "" = ""): void {
+function _appendDoms(
+  $container: Element,
+  doms: unknown,
+  beforeElement: Element | null
+) {
   if (!isValidDomsValue(doms))
     throw new TypeError(
       `when key is 'doms', value should be array/array-like and from one of Element[], HTMLCollection, NodeList`
     );
-  if (beforeTag && beforeTag === "script") {
-    const $script = $container.querySelector("script");
+  if (beforeElement && beforeElement instanceof Element) {
+    if(!$container.contains(beforeElement)) throw new Error('beForeElement not exist in containerElement')
     // @ts-ignore
     for (const dom of doms) {
-      $container.insertBefore(dom, $script);
-    }
-  } else if (beforeTag && beforeTag instanceof Element) {
-    // @ts-ignore
-    for (const dom of doms) {
-      $container.insertBefore(dom, beforeTag);
+      $container.insertBefore(dom, beforeElement);
     }
   } else {
     // @ts-ignore
@@ -207,8 +212,8 @@ function _udomBySign(
   overwriteHandler: ISignHandler,
   appendHandler: ISignHandler,
   removeHandler: ISignHandler
-): void {
-  if (sign == "=") overwriteHandler();
+) {
+  if (sign == "==") overwriteHandler();
   if (sign == "+=") appendHandler();
   if (sign == "-=") removeHandler();
 }
