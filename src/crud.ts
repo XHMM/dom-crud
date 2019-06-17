@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion,no-unsanitized/property */
-import { stringToDomClasses, toKVSEntries, isValidDomsValue, Sign, getType } from "./helpers";
-import { readConfigByKey, _console } from "./config";
+import { stringToDomClasses, toKVSEntries, isValidDomsValue, Sign, getType } from './helpers';
+import { readConfigByKey, _console } from './config';
 
 interface ISignHandler {
   (): void;
@@ -14,19 +14,19 @@ function cdom(tagName: string, ...options: Array<string | Record<string, any>>):
   keyValSignEntries.map(option => {
     const [key, val, sign, config] = option;
     switch (key) {
-      case "class":
+      case 'class':
         $dom.classList.add(...stringToDomClasses(val.toString()));
         break;
-      case "style":
+      case 'style':
         $dom.style.cssText = val.toString();
         break;
-      case "text":
+      case 'text':
         $dom.textContent = val.toString();
         break;
-      case "html":
+      case 'html':
         $dom.innerHTML = val.toString();
         break;
-      case "doms":
+      case 'doms':
         _appendDoms($dom, val, null);
         break;
       default:
@@ -59,11 +59,11 @@ function udom($dom: HTMLElement, ...options: Array<string | Record<string, any>>
   keyValSignEntries.map(option => {
     const [key, value, sign, config] = option;
     switch (key) {
-      case "class":
+      case 'class':
         _udomBySign(
           sign,
           () => {
-            $dom.className = "";
+            $dom.className = '';
             $dom.classList.add(...stringToDomClasses(value.toString()));
           },
           () => {
@@ -74,7 +74,7 @@ function udom($dom: HTMLElement, ...options: Array<string | Record<string, any>>
           }
         );
         break;
-      case "style":
+      case 'style':
         _udomBySign(
           sign,
           () => {
@@ -84,15 +84,15 @@ function udom($dom: HTMLElement, ...options: Array<string | Record<string, any>>
             $dom.style.cssText += value.toString();
           },
           () => {
-            const styleProperties = value.toString().split(";");
+            const styleProperties = value.toString().split(';');
             styleProperties.map((item: string) => {
               $dom.style.removeProperty(item);
             });
           }
         );
         break;
-      case "text":
-        const isPureText = "pureTex" in config ? config.pureText : readConfigByKey("text").pureText;
+      case 'text':
+        const isPureText = 'pureTex' in config ? config.pureText : readConfigByKey('text').pureText;
         _udomBySign(
           sign,
           () => {
@@ -104,12 +104,12 @@ function udom($dom: HTMLElement, ...options: Array<string | Record<string, any>>
             else $dom.textContent += value.toString();
           },
           () => {
-            if (isPureText) ($dom.firstChild! as Text).data = "";
-            else $dom.textContent = "";
+            if (isPureText) ($dom.firstChild! as Text).data = '';
+            else $dom.textContent = '';
           }
         );
         break;
-      case "html":
+      case 'html':
         _udomBySign(
           sign,
           () => {
@@ -119,15 +119,15 @@ function udom($dom: HTMLElement, ...options: Array<string | Record<string, any>>
             $dom.innerHTML += value.toString();
           },
           () => {
-            $dom.innerHTML = "";
+            $dom.innerHTML = '';
           }
         );
         break;
-      case "doms":
+      case 'doms':
         _udomBySign(
           sign,
           () => {
-            $dom.innerHTML = "";
+            $dom.innerHTML = '';
             _appendDoms($dom, value, null);
           },
           () => {
@@ -162,7 +162,7 @@ function ddom($dom: HTMLElement | null): boolean {
     $dom.remove();
     return true;
   } else {
-    _console.warn("ddom", `you passed an invalid parameter(type is ${getType($dom)}), ddom removed nothing`);
+    _console.warn('ddom', `you passed an invalid parameter(type is ${getType($dom)}), ddom removed nothing`);
     return false;
   }
 }
@@ -173,7 +173,7 @@ function _appendDoms($container: Element, doms: unknown, beforeElement: Element 
       `when key is 'doms', value should be array/array-like and from one of Element[], HTMLCollection, NodeList`
     );
   if (beforeElement && beforeElement instanceof Element) {
-    if (!$container.contains(beforeElement)) throw new Error("beForeElement not exist in containerElement");
+    if (!$container.contains(beforeElement)) throw new Error('beForeElement not exist in containerElement');
     // @ts-ignore
     for (const dom of doms) {
       $container.insertBefore(dom, beforeElement);
@@ -194,7 +194,7 @@ function _removeDoms($container: Element, doms: unknown): void {
   for (const dom of doms) {
     if (dom.parentNode == $container) dom.remove();
     else {
-      _console.warn("_removeDoms", `encountered a dom that is not a child dom, removing skipped`);
+      _console.warn('_removeDoms', `encountered a dom that is not a child dom, removing skipped`);
     }
   }
 }
@@ -204,9 +204,9 @@ function _udomBySign(
   appendHandler: ISignHandler,
   removeHandler: ISignHandler
 ): void {
-  if (sign == "==") overwriteHandler();
-  if (sign == "+=") appendHandler();
-  if (sign == "-=") removeHandler();
+  if (sign == '==') overwriteHandler();
+  if (sign == '+=') appendHandler();
+  if (sign == '-=') removeHandler();
 }
 
 export { cdom, rdom, rdoms, udom, ddom };

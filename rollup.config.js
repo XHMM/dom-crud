@@ -1,37 +1,43 @@
-import typescript from "rollup-plugin-typescript2";
-import { terser } from "rollup-plugin-terser";
-import del from "rollup-plugin-delete";
+import typescript from 'rollup-plugin-typescript2';
+import { terser } from 'rollup-plugin-terser';
+import del from 'rollup-plugin-delete';
 import commonjs from 'rollup-plugin-commonjs';
 import resolve from 'rollup-plugin-node-resolve';
 import replace from 'rollup-plugin-replace';
 
-const files = ["index.ts", "config.ts", "crud.ts", "helpers.ts"]
+const files = ['index.ts', 'config.ts', 'crud.ts', 'helpers.ts'];
 const common = {
-  input: "./index.ts",
+  input: './src/index.ts',
   watch: {
     include: files
   }
 };
-const plugins = [typescript(), replace({BUILD: JSON.stringify(process.env.BUILD),include: files}), resolve(), commonjs()];
+const plugins = [
+  typescript(),
+  replace({ BUILD: JSON.stringify(process.env.BUILD), include: files }),
+  resolve(),
+  commonjs()
+];
 
 const umdConfig = {
   ...common,
   output: {
-    file: "./build/index.umd.min.js",
-    format: "umd",
-    name: "crud"
+    file: './build/index.umd.min.js',
+    format: 'umd',
+    name: 'crud'
   },
   // if put del plugin to common plugins, the first output will be cleared because del ran twice
-  plugins: [...plugins, del({ targets: "build/*" }), terser()]
+  plugins: [...plugins, del({ targets: 'build/*' }), terser()]
 };
 
 const esmConfig = {
   ...common,
   output: {
-    file: "./build/index.esm.js",
-    format: "esm"
+    file: './build/index.esm.js',
+    format: 'esm'
   },
   plugins: [...plugins]
 };
 
-export default [umdConfig, esmConfig];
+const config = [umdConfig, esmConfig];
+export default config;

@@ -1,4 +1,4 @@
-import { getType, merge } from "./helpers";
+import { getType, merge } from './helpers';
 
 interface ICrudConfig {
   text: {
@@ -30,35 +30,35 @@ function _muteConsole(): void {
 function _activateConsole(): void {
   _console.log = function(methodName: string, msg: any) {
     console.log(
-      "%c[dom-crud:log][%s]\n %c%s",
-      "color:#18b7ff;background:rgba(0,0,0,0.02);padding:0.2rem",
+      '%c[dom-crud:log][%s]\n %c%s',
+      'color:#18b7ff;background:rgba(0,0,0,0.02);padding:0.2rem',
       methodName,
-      "background:rgba(0,0,0,0.02);padding:0.2rem",
+      'background:rgba(0,0,0,0.02);padding:0.2rem',
       msg
     );
   };
   _console.warn = function(methodName: string, msg: any) {
     console.log(
-      "%c[dom-crud:warn][%s]\n %c%s",
-      "color:orange;background:rgba(0,0,0,0.02);padding:0.2rem",
+      '%c[dom-crud:warn][%s]\n %c%s',
+      'color:orange;background:rgba(0,0,0,0.02);padding:0.2rem',
       methodName,
-      "background:rgba(0,0,0,0.02);padding:0.2rem",
+      'background:rgba(0,0,0,0.02);padding:0.2rem',
       msg
     );
   };
   _console.error = function(methodName: string, msg: any) {
     console.log(
-      "%c[dom-crud:error][%s]\n %c%s",
-      "color:red;background:rgba(0,0,0,0.02);padding:0.2rem",
+      '%c[dom-crud:error][%s]\n %c%s',
+      'color:red;background:rgba(0,0,0,0.02);padding:0.2rem',
       methodName,
-      "background:rgba(0,0,0,0.02);padding:0.2rem",
+      'background:rgba(0,0,0,0.02);padding:0.2rem',
       msg
     );
   };
 }
 const _crudConfigProxy = new Proxy(_crudConfig, {
   set(target, key, val) {
-    if (key == "debug") {
+    if (key == 'debug') {
       if (val == false) {
         _muteConsole();
       } else {
@@ -78,7 +78,7 @@ function getCrudConfig(): ICrudConfig {
 }
 function updateCrudConfig(newConfig: Partial<ICrudConfig>): void {
   const type = getType(newConfig);
-  if (type !== "object") throw new TypeError(`config should be an object, received type is ${type}`);
+  if (type !== 'object') throw new TypeError(`config should be an object, received type is ${type}`);
   merge(_crudConfigProxy, newConfig);
 }
 function readConfigByKey(key: string): any {

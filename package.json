@@ -1,6 +1,6 @@
 {
   "name": "dom-crud",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "let't crud dom but not database",
   "main": "./build/index.esm.js",
   "typings": "./build/index.d.ts",
@@ -13,21 +13,21 @@
     "test": "jest"
   },
   "devDependencies": {
-    "@types/jest": "^24.0.11",
+    "@types/jest": "^24.0.15",
     "eslint": "^5.16.0",
-    "eslint-config-xhmm": "^0.0.7",
-    "jest": "^24.5.0",
-    "prettier": "^1.17.1",
-    "prettier-config-xhmm": "^0.0.4",
-    "rollup": "^1.7.0",
-    "rollup-plugin-commonjs": "^9.2.1",
-    "rollup-plugin-delete": "^0.2.1",
-    "rollup-plugin-node-resolve": "^4.0.1",
-    "rollup-plugin-replace": "^2.1.1",
-    "rollup-plugin-terser": "^4.0.4",
-    "rollup-plugin-typescript2": "^0.20.1",
-    "ts-jest": "^24.0.0",
-    "typescript": "^3.4.5"
+    "eslint-config-xhmm": "^0.0.8",
+    "jest": "^24.8.0",
+    "prettier": "^1.18.2",
+    "prettier-config-xhmm": "^0.0.5",
+    "rollup": "^1.15.6",
+    "rollup-plugin-commonjs": "^10.0.0",
+    "rollup-plugin-delete": "^1.0.0",
+    "rollup-plugin-node-resolve": "^5.0.3",
+    "rollup-plugin-replace": "^2.2.0",
+    "rollup-plugin-terser": "^5.0.0",
+    "rollup-plugin-typescript2": "^0.21.1",
+    "ts-jest": "^24.0.2",
+    "typescript": "^3.5.2"
   },
   "keywords": [
     "dom",

@@ -9,6 +9,6 @@
     "declaration": true,
     "outDir": "build"
   },
-  "include": ["index.ts", "config.ts", "crud.ts", "helpers.ts"],
+  "include": [ "src"],
   "exclude": ["node_modules"]
 }
