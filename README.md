@@ -1,10 +1,13 @@
-<h1>dom-crud</h1>
+<h1  align="center">dom-crud</h1>
 
-Make dom manipulation funny, **c**(create) **r**(read) **u**(update) **d**(delete).
+<div  align="center">Make dom manipulation funny while create, read, update, delete</div>
 
 
-## Install
-- if using `script` tag, **you need to invoke apis using `crud.` prefix**:
+
+## 👉 Install
+
+- If use with `script` tag, **you need to invoke apis using `crud.` prefix** :
+
 ```html
 <script src="https://unpkg.com/dom-crud@latest/build/index.umd.min.js"></script>
 <script>
@@ -12,47 +15,50 @@ Make dom manipulation funny, **c**(create) **r**(read) **u**(update) **d**(delet
     crud.methodName(...)
 </script>
 ```
-- if using as es module: `npm i dom-crud` or `yarn add dom-crud`
+
+- If use as es module: `npm i dom-crud` or `yarn add dom-crud` :
+
 ```js
 import { methodName } from "dom-crud"
 // detail usage are below
 ```
 
-## Basic
+
+
+## 👉 Basic Knowledge
+
 Before going on, there are some terms you should know ：
+
 - **Sign** represents a string contains two character, there are three signs ：
-    - `==` mean overwrite/replace
-    - `-=` mean delete
-    - `+=` mean append
+  - `==` mean overwrite/replace
+  - `-=` mean delete
+  - `+=` mean append
 
-- **KeyValueSignConfig entry**(short for **KVSC entry**) is an array always contains four element - `[Key, Value, Sign, Config]`, `Key` and `Sign` are string and `Value` can be any types, `Config` is an object.
-
-Arguments passed to dom-crud apis will be converted to `KVSC entries` internally, so what we do is not pass KVS entry array but **`string` or `object`** as detailed below ：
-
--  **KVS string** , for example: 
-    - `class-=a b c`
-    - `style==color:red;font-size:2rem`
-    - `html+=<span>hi</span>`
-
-- **KVSC string** , for example: 
-    - `id==a?configA=xx&configB=yy`
-
-- **KVS object** , for example: 
-    - `{ 'id==':'a'}` (equal to `{ 'id==': {value:'a'}}`)
-    - `{ 'class-=': 'a b c'}`
-    - `{ 'style==': 'color:red;font-size:2rem'}`
-    - `{ 'html+=': '<span>hi</span>'}`
-
-- **KVSC object** , for example: 
-    - `{ 'text==': { value:"new text", config: {purText: true} }}`
+- **KVS string** (short for "Key Value Sign") is a function parameter format in string style  what will be used often：there are some [Builtin Keys](#Builtin Keys)  for use, every other keys will be used with `setAttribute` method.  Examples : 
+  - `class-=a b c`
+  - `style==color:red;font-size:2rem`
+  - `html+=<span>hi</span>`
+  - `id==a`
+- **KVSC string** ("C" is short for "Config"), because some keys can have additional configs, details will discuss later. Examples : 
+  - `id==a?configA=xx&configB=yy`
+- **KVS object**  is a function parameter format in object style  what will be used often. Examples : 
+  - `{ 'id==': {value:'a'}}`
+  - you can also specify value directly:  `{ 'id==':'a'}` is equal to above
+  - `{ 'class-=': {value: 'a b c'}}` or `{ 'class-=': 'a b c'}`
+  - `{ 'style==': 'color:red;font-size:2rem'}`
+  - `{ 'html+=': '<span>hi</span>'}`
+- **KVSC object** , Example : 
+  - use `config` key and `value` key at the same time if you need to pass configs:  `{ 'text==': { value:"new text", config: {purText: true} }}`
 
 
-## Api
 
-### `cdom(tagName, strOrObj1, strOrObj2, strOrObj3, strOrObj4, ...)`
-- tagName: `string`
-- strOrObj: `KVS(C) string` or `KVS(C) object` (some special `Key` name are showed [at the end](#special-keys) )
-- **return**: a html element
+## 👉 API
+
+### `cdom(htmlTagName, strOrObj1, strOrObj2, strOrObj3, strOrObj4, ...)`
+
+- htmlTagName : `string`  
+- strOrObj : `KVS(C) string` or `KVS(C) object`)
+- **return ** :  `HtmlElement`
 
 ```js
 import {cdom} from 'dom-crud'
@@ -87,8 +93,10 @@ const $input3 = cdom('input',
 ```
 
 ### `rdom(selector)`  
-- selector: string
-- **return**: a html element
+
+- selector :  `string`    same as `querySelector`
+- **return** :  `HtmlElement`
+
 ```js
 import {rdom} from 'dom-crud'
 
@@ -97,8 +105,9 @@ const $input = rdom('.center').rdom('.word').rdom('.c');
 ```
 
 ### `rdoms(selector)` 
-- selector: string
-- **return**: nodeList
+
+- selector : `string`   same as `querySelectorAll
+- **return **: `NodeList`
 
 ```js
 import {rdoms} from 'dom-crud'
@@ -108,9 +117,10 @@ const $inputs = rdoms('input');
 ```
 
 ### `udom(dom, strOrObj1, strOrObj2, strOrObj3, strOrObj4, ...);`
-- dom: Element
-- strOrObj: `KVS(C) string` or `KVS(C) object` (some special `Key` names are showed [at the end](#special-keys) )
-- **return**: void
+
+- dom : `Element`
+- strOrObj : `KVS(C) string` or `KVS(C) object` 
+- **return** : void
 
 ```js
 import {udom, rdom} from 'dom-crud'
@@ -139,39 +149,43 @@ udom(rdom('input'), {
 ```
 
 ### `ddom(dom)`
-- dom: Element
-- **return**: boolean -- whether removed dom
+
+- dom : `Element`
+- **return** : `boolean`   whether or not removed dom
+
 ```js
 import {ddom, rdom} from 'dom-crud'
 
 ddom(rdom('input')); 
 ```
 
-### global config
-Global config can changed some crud behaviors.
-#### `getCrudConfig()`
-- **return**: global config object
+### `getCrudConfig()`
 
-    currently, the default global config object is very simple as below:
-    ```js
-    import { getCrudConfig } from 'dom-crud'
-    const config = getCrudConfig();
-    console.log(config);
-    /*
-    {
-      text: {
-        // detailed below
-        pureText: false
-      },
-      // whether log debug info(currently, nothing cumbersome logged)
-      debug: false
-    } 
-    */
-    ```
+- **return** : global config object
 
-#### `updateCrudConfig(config)`
-- config: it should be a subset of global config object, anything else will be ignored
-- **return**: void
+  currently, the default global config  is very simple as below:
+
+```js
+import { getCrudConfig } from 'dom-crud'
+const config = getCrudConfig();
+console.log(config);
+/*
+{
+  text: {
+    // detailed below
+    pureText: false
+  },
+  // whether log debug info(currently, nothing cumbersome logged)
+  debug: false
+} 
+*/
+```
+
+### `updateCrudConfig(config)`
+
+- config : it should be a subset of global config object, anything else will be ignored
+- **return** : void
+
 ```js
 import { getCrudConfig, updateCrudConfig } from 'dom-crud'
 const config = getCrudConfig();
@@ -184,78 +198,46 @@ updateCrudConfig({
 
 ```
 
-### local config
-Some crud operation may need some special config to make it better, such as I want to  append doms before specific dom. Local configs are used in `KVSC string/object`:
-```js
-import { cdom, udom} from 'dom-crud';
-
-const $p = cdom('div');
-const $c1 = cdom('div', 'text==c1');
-const $c2 = cdom('div', 'text==c2');
-
-udom($p, {'doms+=': [$c1, $c2]});
-
-/*
-<body>
-    <div>
-        <div>c1</div>
-        <div>c2</div>
-    </div>
-</body>
-*/
-udom(document.body, {'doms+=': [$p]});
 
 
-/*
-<body>
-    <div>
-        <div>c1</div>
-        <div>c3</div>
-        <div>c2</div>
-    </div>
-</body>
-*/
-udom( $p, {
-  'doms+=': {
-    value: [cdom('div', 'text==c3')],
-    config: {
-      before: $c2
-    }
-  }
-})
-```
+## 👉 Builtin Keys
 
+Below list all builtin keys which made `dom-crud` funny. Remind:  any other keys will be used in `setAttribute(key, value)` ：
 
+### `text`
 
-### special keys
-Below list all special keys can make crud more funny, **any other keys will be used in `setAttribute(key, value)`**:
+This key modifies text conent in target dom, V(value) should be `string`. This key's configs as below:
 
-#### text
-This key modifies text conent in target dom, V(value) should be `string`  
+| name     | type      | description                                                  |
+| -------- | --------- | ------------------------------------------------------------ |
+| pureText | `boolean` | If your dom content is 100% plain text, set it to true to make performance boost. This config can be changed by global config. |
 
-**valid local config:**
-```text
-{
- // if your dom content is 100% text and no other doms, set it to true to make performance boost. This config can be changed by global config
-  pureText: boolean
-}
-```
+### `html`
+
+This key modifies html content in target dom, V(value) should be `string`.
+
+### `doms`
+
+This key modifies doms in target dom，V(value) should be one of below :
+
+- `array`  contains `Emelent`
+- `NodeList`
+- ``HTMLCollection`  
+
+This key's configs as below:
+
+| name   | type      | description                                    |
+| ------ | --------- | ---------------------------------------------- |
+| before | `Element` | Remind: Element should child of parent element |
+
+### `style`
+
+This key modifies dom inline styles.
+
+### `class`
+
+This key modifies dom classes.
 
 
 
-#### html
-This modify html content in target dom, V(value) should be `string`
-
-#### doms
-This modify doms in target dom， V(value) should be one of `array`  contains Element as elements, or `NodeList`, or `HTMLCollection`  
-
-**valid local config:** 
-```text
-{
-  before: Element // element should child of parent element
-}
-```
-
-
-## License
-MIT
+**For more keys? Please give me advice**🤣
