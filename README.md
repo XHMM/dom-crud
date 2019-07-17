@@ -58,7 +58,7 @@ Before going on, there are some terms you should know ：
 
 - htmlTagName : `string`  
 - strOrObj : `KVS(C) string` or `KVS(C) object`)
-- **return ** :  `HtmlElement`
+- **return** :  `HtmlElement`
 
 ```js
 import {cdom} from 'dom-crud'
@@ -107,7 +107,7 @@ const $input = rdom('.center').rdom('.word').rdom('.c');
 ### `rdoms(selector)` 
 
 - selector : `string`   same as `querySelectorAll
-- **return **: `NodeList`
+- **return** : `NodeList`
 
 ```js
 import {rdoms} from 'dom-crud'
@@ -222,7 +222,7 @@ This key modifies doms in target dom，V(value) should be one of below :
 
 - `array`  contains `Emelent`
 - `NodeList`
-- ``HTMLCollection`  
+- `HTMLCollection`  
 
 This key's configs as below:
 
