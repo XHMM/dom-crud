@@ -61,7 +61,7 @@ function __spread() {
 /*----------------------------------------------------------------------------*/
 // return type string: array string function null...
 function getType(val) {
-    var rightPart = Object.prototype.toString.call(val).split(" ")[1];
+    var rightPart = Object.prototype.toString.call(val).split(' ')[1];
     return rightPart.slice(0, rightPart.length - 1).toLowerCase();
 }
 /*
@@ -71,15 +71,15 @@ function getType(val) {
 function stringToDomClasses(str) {
     return str
         .trim()
-        .split(" ")
-        .filter(function (item) { return item !== ""; });
+        .split(' ')
+        .filter(function (item) { return item !== ''; });
 }
 function isValidDomsValue(val) {
     var type = getType(val);
-    if (type === "array")
+    if (type === 'array')
         return val.every(function (item) { return item instanceof Element; });
     else
-        return type === "nodelist" || type === "htmlcollection";
+        return type === 'nodelist' || type === 'htmlcollection';
 }
 // function isValidTypeValue() ...
 // function isValidXxxValue() ...
@@ -111,15 +111,15 @@ cdom('div',
 * */
 function _stringToKVSCEntry(str) {
     var res;
-    var sign = "";
-    if (str.includes("-=")) {
-        sign = "-=";
+    var sign = '';
+    if (str.includes('-=')) {
+        sign = '-=';
     }
-    else if (str.includes("+=")) {
-        sign = "+=";
+    else if (str.includes('+=')) {
+        sign = '+=';
     }
-    else if (str.includes("==")) {
-        sign = "==";
+    else if (str.includes('==')) {
+        sign = '==';
     }
     if (sign) {
         var idx = str.indexOf(sign);
@@ -127,13 +127,13 @@ function _stringToKVSCEntry(str) {
         var vc = _vcStringToObject(str.slice(idx + 2));
         res = [k, vc.v, sign, vc.c];
         if (res.length !== 4) {
-            throw new Error("options item format not correct");
+            throw new Error('options item format not correct');
         }
         else
             return res;
     }
     else {
-        throw new Error("options item format not correct");
+        throw new Error('options item format not correct');
     }
 }
 function _objectToKVSEntry(obj) {
@@ -142,28 +142,28 @@ function _objectToKVSEntry(obj) {
         Object.entries(obj).map(function (item) {
             var key = item[0];
             var value = item[1];
-            var sign = "";
-            if (key.endsWith("-=")) {
-                sign = "-=";
+            var sign = '';
+            if (key.endsWith('-=')) {
+                sign = '-=';
             }
-            else if (key.endsWith("+=")) {
-                sign = "+=";
+            else if (key.endsWith('+=')) {
+                sign = '+=';
             }
-            else if (key.endsWith("==")) {
-                sign = "==";
+            else if (key.endsWith('==')) {
+                sign = '==';
             }
             if (sign) {
                 var k = key.match(/.+(?=[-+=]=)/)[0];
                 var v = void 0, c = void 0;
                 var valueType = getType(value);
-                if (valueType === "string") {
+                if (valueType === 'string') {
                     var vc = _vcStringToObject(value);
                     v = vc.v;
                     c = vc.c;
                 }
-                else if (valueType === "object") {
+                else if (valueType === 'object') {
                     if (!value.value) {
-                        throw new Error("options item format not correct");
+                        throw new Error('options item format not correct');
                     }
                     v = value.value;
                     c = value.config || {};
@@ -176,7 +176,7 @@ function _objectToKVSEntry(obj) {
                 res.push([k, v, sign, c]);
             }
             else {
-                throw new Error("options item format not correct");
+                throw new Error('options item format not correct');
             }
         });
         return res;
@@ -186,7 +186,7 @@ function _objectToKVSEntry(obj) {
     }
 }
 function _vcStringToObject(str) {
-    var v = "", c = {};
+    var v = '', c = {};
     var vc = str.trim().match(/(.*)\?([0-9a-zA-Z&=]*)/); // 不能写成 /(.+) .../  因为当value传入了空内容时会导致匹配出错
     // 为null表示没有配置项
     if (vc === null) {
@@ -194,12 +194,12 @@ function _vcStringToObject(str) {
     }
     else if (vc && vc.length === 3) {
         v = vc[1];
-        c = vc[2].split("&").reduce(function (acc, cur) {
-            var arr = cur.split("=");
+        c = vc[2].split('&').reduce(function (acc, cur) {
+            var arr = cur.split('=');
             var value;
-            if (arr[1] === "true")
+            if (arr[1] === 'true')
                 value = true;
-            else if (arr[1] === "false")
+            else if (arr[1] === 'false')
                 value = false;
             else if (arr[1].match(/[0-9]+/g))
                 value = +arr[1];
@@ -220,10 +220,10 @@ function toKVSEntries(options) {
     try {
         for (var options_1 = __values(options), options_1_1 = options_1.next(); !options_1_1.done; options_1_1 = options_1.next()) {
             var option = options_1_1.value;
-            if (getType(option) == "string") {
+            if (getType(option) == 'string') {
                 res.push(_stringToKVSCEntry(option));
             }
-            else if (getType(option) == "object") {
+            else if (getType(option) == 'object') {
                 res.push.apply(res, __spread(_objectToKVSEntry(option)));
             }
         }
@@ -241,13 +241,13 @@ function toKVSEntries(options) {
 function merge(target, source) {
     var targetType = getType(target);
     var sourceType = getType(source);
-    if (targetType !== "object" || sourceType !== "object")
+    if (targetType !== 'object' || sourceType !== 'object')
         throw new TypeError("target and source should both be object, received: target is " + targetType + ", source is " + sourceType);
     for (var sourceKey in source) {
         if (source.hasOwnProperty(sourceKey)) {
             if (sourceKey in target) {
-                var subTargetTypeIsObj = getType(target[sourceKey]) == "object";
-                var subSourceTypeIsObj = getType(source[sourceKey]) == "object";
+                var subTargetTypeIsObj = getType(target[sourceKey]) == 'object';
+                var subSourceTypeIsObj = getType(source[sourceKey]) == 'object';
                 if (!subSourceTypeIsObj && !subTargetTypeIsObj) {
                     target[sourceKey] = source[sourceKey];
                 }
@@ -276,18 +276,18 @@ function _muteConsole() {
 }
 function _activateConsole() {
     _console.log = function (methodName, msg) {
-        console.log("%c[dom-crud:log][%s]\n %c%s", "color:#18b7ff;background:rgba(0,0,0,0.02);padding:0.2rem", methodName, "background:rgba(0,0,0,0.02);padding:0.2rem", msg);
+        console.log('%c[dom-crud:log][%s]\n %c%s', 'color:#18b7ff;background:rgba(0,0,0,0.02);padding:0.2rem', methodName, 'background:rgba(0,0,0,0.02);padding:0.2rem', msg);
     };
     _console.warn = function (methodName, msg) {
-        console.log("%c[dom-crud:warn][%s]\n %c%s", "color:orange;background:rgba(0,0,0,0.02);padding:0.2rem", methodName, "background:rgba(0,0,0,0.02);padding:0.2rem", msg);
+        console.log('%c[dom-crud:warn][%s]\n %c%s', 'color:orange;background:rgba(0,0,0,0.02);padding:0.2rem', methodName, 'background:rgba(0,0,0,0.02);padding:0.2rem', msg);
     };
     _console.error = function (methodName, msg) {
-        console.log("%c[dom-crud:error][%s]\n %c%s", "color:red;background:rgba(0,0,0,0.02);padding:0.2rem", methodName, "background:rgba(0,0,0,0.02);padding:0.2rem", msg);
+        console.log('%c[dom-crud:error][%s]\n %c%s', 'color:red;background:rgba(0,0,0,0.02);padding:0.2rem', methodName, 'background:rgba(0,0,0,0.02);padding:0.2rem', msg);
     };
 }
 var _crudConfigProxy = new Proxy(_crudConfig, {
     set: function (target, key, val) {
-        if (key == "debug") {
+        if (key == 'debug') {
             if (val == false) {
                 _muteConsole();
             }
@@ -307,7 +307,7 @@ function getCrudConfig() {
 }
 function updateCrudConfig(newConfig) {
     var type = getType(newConfig);
-    if (type !== "object")
+    if (type !== 'object')
         throw new TypeError("config should be an object, received type is " + type);
     merge(_crudConfigProxy, newConfig);
 }
@@ -333,19 +333,19 @@ function cdom(tagName) {
         var _a;
         var _b = __read(option, 4), key = _b[0], val = _b[1], sign = _b[2], config = _b[3];
         switch (key) {
-            case "class":
+            case 'class':
                 (_a = $dom.classList).add.apply(_a, __spread(stringToDomClasses(val.toString())));
                 break;
-            case "style":
+            case 'style':
                 $dom.style.cssText = val.toString();
                 break;
-            case "text":
+            case 'text':
                 $dom.textContent = val.toString();
                 break;
-            case "html":
+            case 'html':
                 $dom.innerHTML = val.toString();
                 break;
-            case "doms":
+            case 'doms':
                 _appendDoms($dom, val, null);
                 break;
             default:
@@ -369,7 +369,7 @@ function rdom(selector) {
 function rdoms(selector) {
     return document.querySelectorAll(selector);
 }
-// when removing(-=), just write 'key-=' or {'key-':''}
+// when removing(-=), just write 'key-=' or {'key-=':''}
 // you can chain udom
 function udom($dom) {
     var options = [];
@@ -380,10 +380,10 @@ function udom($dom) {
     keyValSignEntries.map(function (option) {
         var _a = __read(option, 4), key = _a[0], value = _a[1], sign = _a[2], config = _a[3];
         switch (key) {
-            case "class":
+            case 'class':
                 _udomBySign(sign, function () {
                     var _a;
-                    $dom.className = "";
+                    $dom.className = '';
                     (_a = $dom.classList).add.apply(_a, __spread(stringToDomClasses(value.toString())));
                 }, function () {
                     var _a;
@@ -393,20 +393,20 @@ function udom($dom) {
                     (_a = $dom.classList).remove.apply(_a, __spread(stringToDomClasses(value.toString())));
                 });
                 break;
-            case "style":
+            case 'style':
                 _udomBySign(sign, function () {
                     $dom.style.cssText = value.toString();
                 }, function () {
                     $dom.style.cssText += value.toString();
                 }, function () {
-                    var styleProperties = value.toString().split(";");
+                    var styleProperties = value.toString().split(';');
                     styleProperties.map(function (item) {
                         $dom.style.removeProperty(item);
                     });
                 });
                 break;
-            case "text":
-                var isPureText_1 = "pureTex" in config ? config.pureText : readConfigByKey("text").pureText;
+            case 'text':
+                var isPureText_1 = 'pureTex' in config ? config.pureText : readConfigByKey('text').pureText;
                 _udomBySign(sign, function () {
                     if (isPureText_1)
                         $dom.firstChild.data = value.toString();
@@ -419,23 +419,23 @@ function udom($dom) {
                         $dom.textContent += value.toString();
                 }, function () {
                     if (isPureText_1)
-                        $dom.firstChild.data = "";
+                        $dom.firstChild.data = '';
                     else
-                        $dom.textContent = "";
+                        $dom.textContent = '';
                 });
                 break;
-            case "html":
+            case 'html':
                 _udomBySign(sign, function () {
                     $dom.innerHTML = value.toString();
                 }, function () {
                     $dom.innerHTML += value.toString();
                 }, function () {
-                    $dom.innerHTML = "";
+                    $dom.innerHTML = '';
                 });
                 break;
-            case "doms":
+            case 'doms':
                 _udomBySign(sign, function () {
-                    $dom.innerHTML = "";
+                    $dom.innerHTML = '';
                     _appendDoms($dom, value, null);
                 }, function () {
                     console.log(config);
@@ -462,7 +462,7 @@ function ddom($dom) {
         return true;
     }
     else {
-        _console.warn("ddom", "you passed an invalid parameter(type is " + getType($dom) + "), ddom removed nothing");
+        _console.warn('ddom', "you passed an invalid parameter(type is " + getType($dom) + "), ddom removed nothing");
         return false;
     }
 }
@@ -472,7 +472,7 @@ function _appendDoms($container, doms, beforeElement) {
         throw new TypeError("when key is 'doms', value should be array/array-like and from one of Element[], HTMLCollection, NodeList");
     if (beforeElement && beforeElement instanceof Element) {
         if (!$container.contains(beforeElement))
-            throw new Error("beForeElement not exist in containerElement");
+            throw new Error('beForeElement not exist in containerElement');
         try {
             // @ts-ignore
             for (var doms_1 = __values(doms), doms_1_1 = doms_1.next(); !doms_1_1.done; doms_1_1 = doms_1.next()) {
@@ -516,7 +516,7 @@ function _removeDoms($container, doms) {
             if (dom.parentNode == $container)
                 dom.remove();
             else {
-                _console.warn("_removeDoms", "encountered a dom that is not a child dom, removing skipped");
+                _console.warn('_removeDoms', "encountered a dom that is not a child dom, removing skipped");
             }
         }
     }
@@ -529,12 +529,16 @@ function _removeDoms($container, doms) {
     }
 }
 function _udomBySign(sign, overwriteHandler, appendHandler, removeHandler) {
-    if (sign == "==")
+    if (sign == '==')
         overwriteHandler();
-    if (sign == "+=")
+    if (sign == '+=')
         appendHandler();
-    if (sign == "-=")
+    if (sign == '-=')
         removeHandler();
 }
+
+// @ts-ignore
+if (BUILD == 'development')
+    updateCrudConfig({ debug: true });
 
 export { cdom, ddom, getCrudConfig, rdom, rdoms, udom, updateCrudConfig };

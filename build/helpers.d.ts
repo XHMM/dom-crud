@@ -1,4 +1,4 @@
-declare type Sign = "==" | "+=" | "-=";
+declare type Sign = '==' | '+=' | '-=';
 declare type KVSCEntryFromString = [string, string, Sign, Record<string, any>];
 declare type KVSCEntryFromObject = [string, any, Sign, Record<string, any>];
 declare type ValidDomsValue = Element[] | NodeList | HTMLCollection;
