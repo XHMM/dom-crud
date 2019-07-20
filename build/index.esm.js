@@ -537,8 +537,4 @@ function _udomBySign(sign, overwriteHandler, appendHandler, removeHandler) {
         removeHandler();
 }
 
-// @ts-ignore
-if (BUILD == 'development')
-    updateCrudConfig({ debug: true });
-
 export { cdom, ddom, getCrudConfig, rdom, rdoms, udom, updateCrudConfig };

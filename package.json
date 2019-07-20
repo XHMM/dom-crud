@@ -1,6 +1,6 @@
 {
   "name": "dom-crud",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "description": "let't crud dom but not database",
   "main": "./build/index.esm.js",
   "typings": "./build/index.d.ts",
@@ -8,8 +8,8 @@
   "author": "xhmm",
   "license": "MIT",
   "scripts": {
-    "watch": "rollup -c --watch --environment BUILD:development",
-    "build": "rollup -c --environment BUILD:production",
+    "watch": "rollup -c --watch",
+    "build": "rollup -c",
     "eslint:fix": "eslint ./ --fix --ext .js,.tsx,.jsx --ignore-path .gitignore --ignore-path .eslintignore",
     "test": "jest"
   },
