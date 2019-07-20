@@ -131,7 +131,6 @@ function udom($dom: HTMLElement, ...options: Array<string | Record<string, any>>
             _appendDoms($dom, value, null);
           },
           () => {
-            console.log(config);
             _appendDoms($dom, value, config.before || null);
           },
           () => {
