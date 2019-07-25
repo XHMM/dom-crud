@@ -13,8 +13,6 @@ KVSC entry
 [xx, yy, sign, {xx"xx}]
 [xx, yy, sign, {}]
 
-K,V,S 必不为空字符串
-C 可为空对象
 * */
 type KVSCEntryFromString = [string, string, Sign, Record<string, any>];
 type KVSCEntryFromObject = [string, any, Sign, Record<string, any>];
@@ -51,32 +49,6 @@ function isValidDomsValue(val: any): boolean {
 // function isValidTypeValue() ...
 // function isValidXxxValue() ...
 
-/*
-cdom('div',
-  {
-    'doms+=': {
-      value: [cdom('div', 'text==hi!')], // value必须存在，值可为任意类型
-      config: { // config可有可无
-       ca:xx,
-       cb:xx
-      }
-    },
-    "text==": {
-      value:'hi'
-    }
-   'text+=': 'hi',
-   'style+=': 'hi?configA=xx'
-  },
-
-  'text+=hi?configA=xx&configB=xx'
-)
-
- ===>
-
- ['doms', value, '+=',  { configA:xx, configB:xx}]
- 其中value因ley而异，可能去任何类型的值
-
-* */
 function _stringToKVSCEntry(str: string): KVSCEntryFromString {
   let res: KVSCEntryFromString;
   let sign: Sign | '' = '';
@@ -146,8 +118,8 @@ function _objectToKVSEntry(obj: Record<string, any>): KVSCEntryFromObject[] {
 function _vcStringToObject(str: string): { v: string; c: Record<string, string | boolean | number> } {
   let v = '',
     c = {};
-  const vc = str.trim().match(/(.*)\?([0-9a-zA-Z&=]*)/); // 不能写成 /(.+) .../  因为当value传入了空内容时会导致匹配出错
-  // 为null表示没有配置项
+  const vc = str.trim().match(/(.*)\?([0-9a-zA-Z&=]*)/);
+  // null means no config
   if (vc === null) {
     v = str;
   } else if (vc && vc.length === 3) {
