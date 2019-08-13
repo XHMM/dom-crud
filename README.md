@@ -1,26 +1,27 @@
 <h1  align="center">dom-crud</h1>
-
 <div  align="center">Make dom manipulation funny while create, read, update, delete</div>
-
-
 
 ## 👉 Install
 
-- If use with `script` tag, **you need to invoke apis using `crud.` prefix** :
+- use with `script` tag :
 
-```html
-<script src="https://unpkg.com/dom-crud@latest/build/index.umd.min.js"></script>
+  **warning: currently no polyfill is added.**
+
+  **help:  I am so curious why `rollup-plugin-babel` not work in my `rollup.config.js`.** 
+
+```ht
+<script src="https://unpkg.com/dom-crud@latest/build/index.browser.min.js"></script>
 <script>
-    // using crud as a namespace to invoke methods
-    crud.methodName(...)
+    const $div = rdom("div");
+    // go on reading to see details
 </script>
 ```
 
-- If use as es module: `npm i dom-crud` or `yarn add dom-crud` :
+- use as es module: `npm i dom-crud` or `yarn add dom-crud` :
 
 ```js
-import { methodName } from "dom-crud"
-// detail usage are below
+import { cdrom, rdom, udom, ddom, getCrudConfig, updateCrudConfig } from "dom-crud"
+// go on reading to see details
 ```
 
 
@@ -33,7 +34,6 @@ Before going on, there are some terms you should know ：
   - `==` mean overwrite/replace
   - `-=` mean delete
   - `+=` mean append
-
 - **KVS string** (short for "Key Value Sign") is a function parameter format in string style  what will be used often：there are some [Builtin Keys](#Builtin Keys)  for use, every other keys will be used with `setAttribute` method.  Examples : 
   - `class-=a b c`
   - `style==color:red;font-size:2rem`
@@ -58,10 +58,10 @@ Before going on, there are some terms you should know ：
 
 - htmlTagName : `string`  
 - strOrObj : `KVS(C) string` or `KVS(C) object`)
-- **return** :  `HtmlElement`
+- **return** :  `Element`
 
 ```js
-import {cdom} from 'dom-crud'
+import { cdom } from 'dom-crud'
 
 // below will create a dom like this:
 // <input type='text' class='center big red' style='font-size:3rem;font-weight:bold'/>
@@ -95,24 +95,24 @@ const $input3 = cdom('input',
 ### `rdom(selector)`  
 
 - selector :  `string`    same as `querySelector`
-- **return** :  `HtmlElement`
+- **return** :  `Element`
 
 ```js
-import {rdom} from 'dom-crud'
+import { rdom } from 'dom-crud'
 
-// when reading single dom, you can chain it
+// you can chain it
 const $input = rdom('.center').rdom('.word').rdom('.c'); 
 ```
 
 ### `rdoms(selector)` 
 
-- selector : `string`   same as `querySelectorAll
+- selector : `string`   same as `querySelectorAll`
 - **return** : `NodeList`
 
 ```js
-import {rdoms} from 'dom-crud'
+import { rdoms } from 'dom-crud'
 
-// multi doms cannot chain
+// cannot chain
 const $inputs = rdoms('input'); 
 ```
 
@@ -123,7 +123,7 @@ const $inputs = rdoms('input');
 - **return** : void
 
 ```js
-import {udom, rdom} from 'dom-crud'
+import { udom, rdom } from 'dom-crud'
 
 // below will remove all inline styles and then add blue color
 udom(rdom('input'), 'style==color:blue;');
@@ -154,7 +154,7 @@ udom(rdom('input'), {
 - **return** : `boolean`   whether or not removed dom
 
 ```js
-import {ddom, rdom} from 'dom-crud'
+import { ddom, rdom } from 'dom-crud'
 
 ddom(rdom('input')); 
 ```
