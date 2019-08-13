@@ -1,18 +1,29 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion,no-unsanitized/property */
+/* eslint-disable no-unsanitized/property */
 import { stringToDomClasses, toKVSEntries, isValidDomsValue, Sign, getType } from './helpers';
-import { readConfigByKey, _console } from './config';
+import { readConfigByKey } from './config';
+import logger from './logger';
 
 interface ISignHandler {
   (): void;
 }
+interface IWithRDom {
+  rdom: typeof rdom;
+}
+interface IWithUDom {
+  rdom: typeof rdom;
+}
+interface IWithDDom {
+  rdom: typeof rdom;
+}
 
-// creating dom not affected by signs
-// when dom and html exist at the same time, content will be added in order
-function cdom(tagName: string, ...options: Array<string | Record<string, any>>): HTMLElement {
+function cdom<E extends HTMLElement = HTMLElement>(
+  tagName: string,
+  ...options: Array<string | Record<string, any>>
+): E {
   const $dom = document.createElement(tagName);
   let keyValSignEntries = toKVSEntries(options);
   keyValSignEntries.map(option => {
-    const [key, val, sign, config] = option;
+    const [key, val] = option;
     switch (key) {
       case 'class':
         $dom.classList.add(...stringToDomClasses(val.toString()));
@@ -34,27 +45,29 @@ function cdom(tagName: string, ...options: Array<string | Record<string, any>>):
         break;
     }
   });
-  return $dom;
+  return $dom as E;
 }
 
-// you can chain rdom
-function rdom<E extends Element = Element>(selector: string): E | null {
-  const $dom = document.querySelector<E>(selector);
+function rdom<K extends keyof HTMLElementTagNameMap>(selectors: K): HTMLElementTagNameMap[K] & IWithRDom | null;
+function rdom<K extends keyof SVGElementTagNameMap>(selectors: K): SVGElementTagNameMap[K] & IWithRDom | null;
+function rdom<E extends Element = Element>(selectors: string): E & IWithRDom | null;
+function rdom(selector: any): any {
+  const $dom = document.querySelector(selector);
   if ($dom) {
-    // @ts-ignore
     $dom.rdom = $dom.querySelector;
     return $dom;
   }
   return null;
 }
-// rdoms cannot chain
-function rdoms<E extends Element = Element>(selector: string): NodeListOf<E> {
-  return document.querySelectorAll<E>(selector);
+
+function rdoms<K extends keyof HTMLElementTagNameMap>(selectors: K): NodeListOf<HTMLElementTagNameMap[K]>;
+function rdoms<K extends keyof SVGElementTagNameMap>(selectors: K): NodeListOf<SVGElementTagNameMap[K]>;
+function rdoms<E extends Element = Element>(selectors: string): NodeListOf<E>;
+function rdoms(selector: any): any {
+  return document.querySelectorAll(selector);
 }
 
-// when removing(-=), just write 'key-=' or {'key-=':''}
-// you can chain udom
-function udom($dom: HTMLElement, ...options: Array<string | Record<string, any>>): HTMLElement {
+function udom($dom: HTMLElement, ...options: Array<string | Record<string, any>>): void {
   let keyValSignEntries = toKVSEntries(options);
   keyValSignEntries.map(option => {
     const [key, value, sign, config] = option;
@@ -153,7 +166,6 @@ function udom($dom: HTMLElement, ...options: Array<string | Record<string, any>>
         );
     }
   });
-  return $dom;
 }
 
 function ddom($dom: HTMLElement | null): boolean {
@@ -161,39 +173,40 @@ function ddom($dom: HTMLElement | null): boolean {
     $dom.remove();
     return true;
   } else {
-    _console.warn('ddom', `you passed an invalid parameter(type is ${getType($dom)}), ddom removed nothing`);
+    logger.warn('ddom', `you passed an invalid parameter(type is ${getType($dom)}), ddom removed nothing`);
     return false;
   }
 }
 
-function _appendDoms($container: Element, doms: unknown, beforeElement: Element | null): void {
+function _appendDoms(
+  $container: Element,
+  doms: Element[] | HTMLCollection | NodeList,
+  beforeElement: Element | null
+): void {
   if (!isValidDomsValue(doms))
     throw new TypeError(
       `when key is 'doms', value should be array/array-like and from one of Element[], HTMLCollection, NodeList`
     );
   if (beforeElement && beforeElement instanceof Element) {
     if (!$container.contains(beforeElement)) throw new Error('beForeElement not exist in containerElement');
-    // @ts-ignore
     for (const dom of doms) {
       $container.insertBefore(dom, beforeElement);
     }
   } else {
-    // @ts-ignore
     for (const dom of doms) {
       $container.appendChild(dom);
     }
   }
 }
-function _removeDoms($container: Element, doms: unknown): void {
+function _removeDoms($container: Element, doms: Element[] | HTMLCollection | NodeList): void {
   if (!isValidDomsValue(doms))
     throw new TypeError(
       `when key is 'doms', value should be array/array-like and from one of Element[], HTMLCollection, NodeList`
     );
-  // @ts-ignore
   for (const dom of doms) {
     if (dom.parentNode == $container) dom.remove();
     else {
-      _console.warn('_removeDoms', `encountered a dom that is not a child dom, removing skipped`);
+      logger.warn('_removeDoms', `encountered a dom that is not a child dom, removing skipped`);
     }
   }
 }

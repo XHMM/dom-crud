@@ -1,4 +1,5 @@
 import { getType, merge } from './helpers';
+import { muteConsole, activateConsole } from './logger';
 
 interface ICrudConfig {
   text: {
@@ -6,63 +7,22 @@ interface ICrudConfig {
   };
   debug: boolean;
 }
-interface IConsole {
-  log(methodName: string, msg: any): void;
-  warn(methodName: string, msg: any): void;
-  error(methodName: string, msg: any): void;
-}
 
-// this object must have at most two level depth, must can to be a  valid JSON
+// config object must have at most two level depth and must can to be a  valid JSON
 const _crudConfig: ICrudConfig = {
   text: {
     pureText: false
   },
   debug: false
 };
-// todo: add more debug info for apis
-// @ts-ignore
-let _console: IConsole = {};
-function _muteConsole(): void {
-  _console.log = function() {};
-  _console.warn = function() {};
-  _console.error = function() {};
-}
-function _activateConsole(): void {
-  _console.log = function(methodName: string, msg: any) {
-    console.log(
-      '%c[dom-crud:log][%s]\n %c%s',
-      'color:#18b7ff;background:rgba(0,0,0,0.02);padding:0.2rem',
-      methodName,
-      'background:rgba(0,0,0,0.02);padding:0.2rem',
-      msg
-    );
-  };
-  _console.warn = function(methodName: string, msg: any) {
-    console.log(
-      '%c[dom-crud:warn][%s]\n %c%s',
-      'color:orange;background:rgba(0,0,0,0.02);padding:0.2rem',
-      methodName,
-      'background:rgba(0,0,0,0.02);padding:0.2rem',
-      msg
-    );
-  };
-  _console.error = function(methodName: string, msg: any) {
-    console.log(
-      '%c[dom-crud:error][%s]\n %c%s',
-      'color:red;background:rgba(0,0,0,0.02);padding:0.2rem',
-      methodName,
-      'background:rgba(0,0,0,0.02);padding:0.2rem',
-      msg
-    );
-  };
-}
 const _crudConfigProxy = new Proxy(_crudConfig, {
   set(target, key, val) {
     if (key == 'debug') {
-      if (val == false) {
-        _muteConsole();
-      } else {
-        _activateConsole();
+      if (val === false) {
+        muteConsole();
+      }
+      if (val === true) {
+        activateConsole();
       }
     }
     // @ts-ignore
@@ -70,8 +30,6 @@ const _crudConfigProxy = new Proxy(_crudConfig, {
     return true;
   }
 });
-// debug is false default, so need to call this manually to mute _console
-_muteConsole();
 
 function getCrudConfig(): ICrudConfig {
   return JSON.parse(JSON.stringify(_crudConfigProxy));
@@ -88,4 +46,4 @@ function readConfigByKey(key: string): any {
   } else throw new Error(`${key} not exists in global crud config`);
 }
 
-export { getCrudConfig, updateCrudConfig, readConfigByKey, _console };
+export { getCrudConfig, updateCrudConfig, readConfigByKey };

@@ -3,7 +3,7 @@ import { getCrudConfig, updateCrudConfig } from '../src/config';
 
 describe('cdom', () => {
   test('create a dom without attributes', () => {
-    const $dom = cdom('div');
+    const $dom = cdom<HTMLDivElement>('div');
     expect($dom.tagName.toLowerCase()).toBe('div');
   });
   test('create a dom with attributes using different way', () => {

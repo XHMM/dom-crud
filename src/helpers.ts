@@ -1,19 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 type Sign = '==' | '+=' | '-=';
 
-/*
-KVSC string:
-xx==aa
-xx-=aa
-x-=aa
-xx+=aa
-xx=aa?configA=xx&configB=xx
-
-KVSC entry
-[xx, yy, sign, {xx"xx}]
-[xx, yy, sign, {}]
-
-* */
 type KVSCEntryFromString = [string, string, Sign, Record<string, any>];
 type KVSCEntryFromObject = [string, any, Sign, Record<string, any>];
 
@@ -24,16 +11,11 @@ type ValidDomsValue = Element[] | NodeList | HTMLCollection;
 
 /*----------------------------------------------------------------------------*/
 
-// return type string: array string function null...
 function getType(val: any): string {
   const rightPart = Object.prototype.toString.call(val).split(' ')[1];
   return rightPart.slice(0, rightPart.length - 1).toLowerCase();
 }
 
-/*
- * class name cannot contain space
- * ' a b c'  ===> ['a', 'b', 'c']
- * */
 function stringToDomClasses(str: string): string[] {
   return str
     .trim()
@@ -139,7 +121,6 @@ function _vcStringToObject(str: string): { v: string; c: Record<string, string |
     c
   };
 }
-
 // below function not deal with KVS's  V part, it should be dealt depend on key in cdom/udom
 function toKVSEntries(options: any[]): Array<KVSCEntryFromString | KVSCEntryFromObject> {
   let res = [];

@@ -4,8 +4,9 @@ import del from 'rollup-plugin-delete';
 import commonjs from 'rollup-plugin-commonjs';
 import resolve from 'rollup-plugin-node-resolve';
 import replace from 'rollup-plugin-replace';
+import babel from 'rollup-plugin-babel';
 
-const files = ['index.ts', 'config.ts', 'crud.ts', 'helpers.ts'];
+const files = ['index.ts', 'config.ts', 'crud.ts', 'helpers.ts', 'logger.ts'];
 const common = {
   input: './src/index.ts',
   watch: {
@@ -16,18 +17,24 @@ const plugins = [
   typescript(),
   replace({ BUILD: JSON.stringify(process.env.BUILD), include: files }),
   resolve(),
-  commonjs()
+  commonjs(),
+  terser()
 ];
 
-const umdConfig = {
+const browserConfig = {
   ...common,
   output: {
-    file: './build/index.umd.min.js',
-    format: 'umd',
-    name: 'crud'
+    file: './build/index.browser.min.js',
+    format: 'iife',
+    name: 'window',
+    extend: true
   },
-  // if put del plugin to common plugins, the first output will be cleared because del ran twice
-  plugins: [...plugins, del({ targets: 'build/*' }), terser()]
+  plugins: [
+    babel(),
+    ...plugins,
+    // if put del plugin to common plugins, the first output will be cleared because del ran twice
+    del({ targets: 'build/*' })
+  ]
 };
 
 const esmConfig = {
@@ -39,5 +46,5 @@ const esmConfig = {
   plugins: [...plugins]
 };
 
-const config = [umdConfig, esmConfig];
+const config = [browserConfig, esmConfig];
 export default config;
